@@ -1,0 +1,3 @@
+PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
+@reboot /home/controller/controller/venv/bin/flask --app /home/controller/controller/wsgi run --host=0.0.0.0 --po>
+*/1 * * * * /home/controller/controller/venv/bin/python /home/controller/controller/controller.py -w >> /home/con>

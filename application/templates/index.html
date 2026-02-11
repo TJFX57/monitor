@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Monitor Dashboard</title>
+    <link rel="icon" href="{{ url_for('static', filename='favicon.ico') }}">
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static',filename='style.css') }}">
+    <script src={{ url_for('static', filename='script.js' ) }}></script>
+</head>
+
+<body>
+    <h1>Monitor Dashboard 📊</h1>
+
+    <div class="wrapper">
+
+        <!-- Data -->
+        <div class="pannel">
+            <div class="pannel-heading">
+                <h2>Data</h2>
+            </div>
+            <div class="pannel-content">
+                <a href="{{ url_for('download_data') }}" title="Download all database data">Download</a>
+                <a href="{{ url_for('delete_data') }}" title="Delete all database data">Delete</a>
+            </div>
+        </div>
+
+        <!-- Logging -->
+        <div class="pannel">
+            <div class="pannel-heading">
+                <h2>Logging</h2>
+            </div>
+            <div class="pannel-content">
+                <label for="checkbox-logging-ability">
+                    <input type="checkbox" id="checkbox-logging-ability" href="{{ url_for('change_logging_ability') }}"
+                        {{ "checked" if logging_ability}}>Data Logging
+                </label>
+                <a href="{{ url_for('log_data') }}" title="Log current data to database">Log</a>
+            </div>
+        </div>
+
+        <!-- Temperature -->
+        <div class="pannel-tall">
+            <div class="pannel-heading">
+                <h2>Temperature</h2>
+            </div>
+            <div class="pannel-content">
+                <p id="date-time">Currently: {{ temperature }}°C</p>
+            </div>
+            <div class="pannel-content">
+                <canvas id="temperature-chart"></canvas>
+            </div>
+        </div>
+
+        <!-- Pressure -->
+        <div class="pannel-tall">
+            <div class="pannel-heading">
+                <h2>Pressure</h2>
+            </div>
+            <div class="pannel-content">
+                <p id="pressure"> Currently: {{ pressure }}HPa</p>
+            </div>
+            <div class="pannel-content">
+                <canvas id="pressure-chart"></canvas>
+            </div>
+        </div>
+
+        <!-- Humidity -->
+        <div class="pannel-tall">
+            <div class="pannel-heading">
+                <h2>Humidity</h2>
+            </div>
+            <div class="pannel-content">
+                <p id="humidity">Currently: {{ humidity }}RH</p>
+            </div>
+            <div class="pannel-content">
+                <canvas id="humidity-chart"></canvas>
+            </div>
+        </div>
+
+        <!-- Light -->
+        <div class="pannel-tall">
+            <div class="pannel-heading">
+                <h2>Light</h2>
+            </div>
+            <div class="pannel-content">
+                <p id="light">Currently: {{ light }}lx</p>
+            </div>
+            <div class="pannel-content">
+                <canvas id="light-chart"></canvas>
+            </div>
+        </div>
+
+        <div class="pannel-tall">
+            <div class="pannel-heading">
+                <h2>Monitor View </h2>
+            </div>
+            <div class="pannel-content">
+                <a href="{{ url_for('capture_image') }}" title="Capture image">Capture</a>
+                <a href="{{ url_for('delete_image') }}" title="Delete image">Delete</a>
+            </div>
+            <div class="pannel-content">
+                <img src="{{ url_for('static', filename='image.jpg') }}">
+            </div>
+        </div> 
+
+        <!-- Controller -->
+        <div class="pannel">
+            <div class="pannel-heading">
+                <h2>Controller </h2>
+            </div>
+            <div class="pannel-content">
+                <a href="{{ url_for('reboot_controller') }}" title="Reboot controller in 1 minute">Reboot</a>
+                <a href="{{ url_for('update_controller') }}" title="Update controller on next reboot">Update</a>
+            </div>
+            <div class="pannel-content">
+                <table>
+                    <tr>
+                        <th title="0 to 70">WiFi Quality</th>
+                        <td id="wifi-quality">{{ wifi_quality }}/70</td>
+                    </tr>
+                    <tr>
+                        <th title="-90 to -30">WiFi Strength</th>
+                        <td id="wifi-strength">{{ wifi_strength }}dBm</td>
+                    </tr>
+                    <tr>
+                        <th>Hostname</th>
+                        <td id="hostname">{{ hostname }}</td>
+                    </tr>
+                    <tr>
+                        <th>Version</th>
+                        <td id="version">{{ version }}</td>
+                    </tr>
+                </table>
+            </div>
+        </div>
+
+        <script>
+            const timeData = {{ time_data| tojson }};
+            const temperatureData = {{ temperature_data| tojson }};
+            const pressureData = {{ pressure_data| tojson }};
+            const humidityData = {{ humidity_data| tojson }};
+            const lightData = {{ light_data| tojson }};
+        </script>
+
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.2.1/dist/chart.umd.min.js"></script>
+    <script type="text/javascript" src="../static/graph.js"></script>
+
+</body>
+
+</html>

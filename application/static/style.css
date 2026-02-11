@@ -1,0 +1,88 @@
+* {
+    font-family: Arial;
+}
+
+h1 {
+    margin: .5em;
+}
+
+a, button, label {
+    color: darkslategrey;
+    background-color: lightgrey;
+    border: none;
+    font-size: 1em;
+    border-radius: .25em;
+    padding: .25em .5em;
+    margin: .25em;
+    text-decoration: none;
+    display: inline-block;
+}
+
+a:hover, button:hover, label:hover{
+    filter: brightness(80%);
+}
+
+input[type="checkbox"] {
+    margin: 0 .25em 0 0;
+}
+
+body {
+    background-color: darkslategrey;
+    color: lightgrey;
+    text-align: center;
+}
+
+table, th, td {
+    border: 1px solid;
+    border-color: lightslategray;
+    border-collapse: collapse;
+}
+
+th, td {
+    padding: 0 .25em;
+}
+
+.wrapper {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(275px, 1fr));
+    grid-auto-flow: dense;
+    gap: .5em;
+}
+
+.pannel, .pannel-tall {
+    border-radius: .5em;
+    background-color: rgba(255, 255, 255, 0.16); /* Add white overlay transparenecy */
+    padding: .5em;
+    display: inline-flex;
+    flex-direction: column;
+}
+
+.pannel-tall {
+    grid-row-end: span 2;
+}
+
+.pannel-heading > h2{
+    margin: 0;
+}
+
+.pannel-content {
+    margin: auto;
+    padding: .25em;
+}
+
+.pannel-content > p {
+    margin: 0;
+}
+
+.pannel-content > label {
+    display: inline-block;
+    white-space: nowrap;
+}
+
+.pannel-content > canvas, img {
+    max-width: 100%;
+}
+
+.pannel-content > img {
+    border-radius: .5em;
+}
