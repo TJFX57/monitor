@@ -7,6 +7,8 @@ Monitor is a program to monitor the environment via sensors attached to a raspbe
 git clone https://github.com/TJFX57/monitor.git
 create venv
 install requirements.txt
+activiate i2c on pi
+reboot
 
 
 ## Usage

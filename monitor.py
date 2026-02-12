@@ -3,6 +3,7 @@ import sqlite3
 from math import isnan
 from statistics import mean
 from datetime import datetime
+from flask import current_app
 from display import Display
 from PiicoDev_BME280 import PiicoDev_BME280
 from PiicoDev_VEML6030 import PiicoDev_VEML6030
@@ -11,8 +12,8 @@ from pathlib import Path
 
 BASE_DIR = Path(__file__).resolve().parent
 
-DATABASE_PATH = BASE_DIR / "data.db"
-DATABASE_SCHEMA_PATH = BASE_DIR / "schema.sql"
+DATABASE_PATH = Path(current_app.instance_path) / "data.db"
+DATABASE_SCHEMA_PATH = BASE_DIR / "application" / "schema.sql"
 
 def get_time():
     return datetime.now().strftime('%Y-%m-%d %H:%M:%S.%f')[:-3]

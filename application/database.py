@@ -5,7 +5,7 @@ from pathlib import Path
 
 BASE_DIR = Path(__file__).resolve().parent
 
-DATABASE_PATH = BASE_DIR / "data.db"
+DATABASE_PATH = Path(current_app.instance_path) / "data.db"
 DATABASE_SCHEMA_PATH = BASE_DIR / "schema.sql"
 
 def get_database():
