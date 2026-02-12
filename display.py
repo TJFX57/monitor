@@ -1,7 +1,10 @@
 from PiicoDev_RGB import PiicoDev_RGB
 import json
+from pathlib import Path
 
-JSON_PATH = '/home/controller/display.json'
+BASE_DIR = Path(__file__).resolve().parent
+
+JSON_PATH = BASE_DIR / "display.json"
 
 # LED RBG colours.
 RED     = [255, 0, 0]

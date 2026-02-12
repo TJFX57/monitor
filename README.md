@@ -4,8 +4,14 @@ Monitor is a program to monitor the environment via sensors attached to a raspbe
 
 ## Installation
 
+git clone https://github.com/TJFX57/monitor.git
+create venv
+install requirements.txt
+
+
 ## Usage
-python3 controller.py -w -> read and write data to database
-python3 controller.py -r -> read measurements to terminal
+python3 monitor.py -w -> read and write data to database
+python3 monitor.py -r -> read measurements to terminal
 
 ## Todo
+- Use systemd instead of cron

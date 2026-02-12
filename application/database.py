@@ -1,9 +1,12 @@
 import sqlite3
 from flask import current_app
 from flask import g
+from pathlib import Path
 
-DATABASE_PATH = '/home/controller/data.db'
-DATABASE_SCHEMA_PATH = '/home/controller/controller/schema.sql'
+BASE_DIR = Path(__file__).resolve().parent
+
+DATABASE_PATH = BASE_DIR / "data.db"
+DATABASE_SCHEMA_PATH = BASE_DIR / "schema.sql"
 
 def get_database():
     database = getattr(g, '_database', None) 
@@ -38,6 +41,6 @@ def close_database(e=None):
     if database is not None:
         database.close()
 
-# function refrences to be access by the app's context manager
+# function references to be access by the app's context manager
 def init_app(app):
     app.teardown_appcontext(close_database)

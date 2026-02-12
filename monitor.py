@@ -7,19 +7,32 @@ from display import Display
 from PiicoDev_BME280 import PiicoDev_BME280
 from PiicoDev_VEML6030 import PiicoDev_VEML6030
 from PiicoDev_TMP117 import PiicoDev_TMP117
+from pathlib import Path
 
-DATABASE_PATH = '/home/controller/data.db'
-DATABASE_SCHEMA_PATH = '/home/controller/controller/schema.sql'
+BASE_DIR = Path(__file__).resolve().parent
+
+DATABASE_PATH = BASE_DIR / "data.db"
+DATABASE_SCHEMA_PATH = BASE_DIR / "schema.sql"
 
 def get_time():
     return datetime.now().strftime('%Y-%m-%d %H:%M:%S.%f')[:-3]
 
-def get_temperature(sensor: PiicoDev_TMP117): #Does not fault to an error!
-    measurement = sensor.readTempC()
+from math import isnan
+
+def get_temperature(sensor):
+    if isinstance(sensor, PiicoDev_TMP117):
+        measurement = sensor.readTempC()
+
+    elif isinstance(sensor, PiicoDev_BME280):
+        measurement, _, _ = sensor.values()
+
+    else:
+        raise TypeError("Unsupported sensor type")
+
     if isnan(measurement):
         raise ValueError("could not get temperature measurement")
-    else:
-        return measurement
+
+    return measurement
 
 def get_pressure(sensor: PiicoDev_BME280): #Does not fault to an error!
     _, measurement, _ = sensor.values()
@@ -42,7 +55,7 @@ def get_light(sensor: PiicoDev_VEML6030): #Does not fault to an error!
     else:
         return measurement
 
-# Measure data and average 3 times to limit any outliers in measurement.
+# Measure data and average 3 times to limit any outliers in measurement
 def read_data(sample_size=3):
     with Display(mode='r'):
         try:
@@ -51,10 +64,10 @@ def read_data(sample_size=3):
             veml6030 = PiicoDev_VEML6030()
             tmp117 = PiicoDev_TMP117()
 
-            # Read and assign initial altitude reading.
+            # Read and assign initial altitude reading
             zero_alt = bme280.altitude()
 
-            # Initialise sensor value lists.
+            # Initialise sensor value lists
             temp_C_values = []
             pres_HPa_values = []
             hum_RH_values = []
@@ -63,12 +76,12 @@ def read_data(sample_size=3):
             date_time = get_time()
 
             for _ in range(sample_size):
-                # Read and assign the sensor values.
+                # Read and assign the sensor values
                 temp_C_values.append(get_temperature(tmp117))
                 pres_HPa_values.append((get_pressure(bme280))/100)
                 hum_RH_values.append(get_humidity(bme280))
                 light_Lx_values.append(get_light(veml6030))
-            # Find average of measurement values.
+            # Find average of measurement values
             temp_C_ave = round(mean(temp_C_values), 2)
             pres_HPa_ave = round(mean(pres_HPa_values), 2)
             hum_RH_ave = round(mean(hum_RH_values), 2)
@@ -93,7 +106,7 @@ def write_data(data: tuple, mode='a'):
 
 if __name__ == '__main__':
     # Initialize the input argument parser, add and parse input arguments.
-    parser = argparse.ArgumentParser(description="System Controller")
+    parser = argparse.ArgumentParser(description="Monitor")
     parser.add_argument('-r', '--read', help="read measurements to terminal", action='store_true')
     parser.add_argument('-w', '--write', help="write measurements to file", action='store_true')
     parser.add_argument('repeat', nargs='?', help="number of times to read/write", default=1, type=int)

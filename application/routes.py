@@ -11,11 +11,15 @@ from os import getlogin
 from subprocess import run
 from socket import gethostname
 import csv
-import controller
+import monitor
 from display import Display
 
-CSV_PATH = '/home/controller/data.csv'
-IMAGE_PATH = '/home/controller/controller/application/static/image.jpg'
+from pathlib import Path
+
+BASE_DIR = Path(__file__).resolve().parent
+
+CSV_PATH = BASE_DIR / "data.csv"
+IMAGE_PATH = BASE_DIR / "image.jgp"
 
 def get_connection_strength():
     link_start = 'Link Quality='
@@ -38,18 +42,18 @@ def get_connection_strength():
 
 def get_logging_job():
     cron = CronTab(user=getlogin())
-    for job in cron.find_command('controller.py -w'):
+    for job in cron.find_command('monitor.py -w'):
         return job, cron
 
 def get_version_hash():
-    return run(['git', 'rev-parse', '--short', 'main'], cwd='/home/controller/controller', text=True, capture_output=True).stdout
+    return run(['git', 'rev-parse', '--short', 'main'], cwd=BASE_DIR, text=True, capture_output=True).stdout
 
 @app.route('/')
 def index():
     job, _ = get_logging_job()
     wifi_quality, wifi_strength = get_connection_strength()
     version = get_version_hash()
-    date_time, temperature, pressure, humidity, light = controller.read_data()
+    date_time, temperature, pressure, humidity, light = monitor.read_data()
 
     rows = database.query_database('SELECT * FROM measurements ORDER BY "date time" DESC LIMIT 1440')
 
@@ -109,7 +113,7 @@ def delete_data():
 
 @app.route('/log_data')
 def log_data():
-    controller.write_data(controller.read_data(), mode='m')
+    monitor.write_data(monitor.read_data(), mode='m')
     return redirect(url_for('index'))
 
 @app.route('/capture_image')
@@ -122,12 +126,12 @@ def delete_image():
     run(['rm', IMAGE_PATH])
     return redirect(url_for('index'))
 
-@app.route('/reboot_controller')
-def reboot_controller():
+@app.route('/reboot_monitor')
+def reboot_monitor():
     run(["sudo", "shutdown", "-r", "1"])
     return redirect(url_for('index'))
 
-@app.route('/update_controller')
-def update_controller():
-    run(["git", "pull"], cwd="/home/controller/controller")
+@app.route('/update_monitor')
+def update_monitor():
+    run(["git", "pull"], cwd=BASE_DIR)
     return redirect(url_for('index'))
