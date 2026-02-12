@@ -8,10 +8,13 @@ BASE_DIR = Path(__file__).resolve().parent
 DATABASE_PATH = Path(current_app.instance_path) / "data.db"
 DATABASE_SCHEMA_PATH = BASE_DIR / "schema.sql"
 
+def get_database_path():
+    return Path(current_app.instance_path) / "data.db"
+
 def get_database():
     database = getattr(g, '_database', None) 
     if database is None:
-        database = g._database = sqlite3.connect(DATABASE_PATH)
+        database = g._database = sqlite3.connect(get_database_path())
         database.row_factory = sqlite3.Row
     return database
 
