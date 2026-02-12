@@ -17,3 +17,4 @@ python3 monitor.py -r -> read measurements to terminal
 
 ## Todo
 - Use systemd instead of cron
+- make display useable on it's own

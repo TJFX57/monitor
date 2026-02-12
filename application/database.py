@@ -5,11 +5,12 @@ from pathlib import Path
 
 BASE_DIR = Path(__file__).resolve().parent
 
-DATABASE_PATH = Path(current_app.instance_path) / "data.db"
 DATABASE_SCHEMA_PATH = BASE_DIR / "schema.sql"
 
 def get_database_path():
-    return Path(current_app.instance_path) / "data.db"
+    return Path(__file__).resolve().parent.parent / "instance" / "data.db"
+
+DATABASE_PATH = get_database_path()
 
 def get_database():
     database = getattr(g, '_database', None) 
