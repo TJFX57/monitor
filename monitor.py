@@ -13,7 +13,7 @@ from pathlib import Path
 BASE_DIR = Path(__file__).resolve().parent
 
 def get_database_path():
-    return Path(__file__).resolve().parent.parent / "instance" / "data.db"
+    return Path(__file__).resolve().parent / "instance" / "data.db"
 
 DATABASE_PATH = get_database_path()
 DATABASE_SCHEMA_PATH = BASE_DIR / "application" / "schema.sql"

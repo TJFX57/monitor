@@ -8,7 +8,7 @@ BASE_DIR = Path(__file__).resolve().parent
 DATABASE_SCHEMA_PATH = BASE_DIR / "schema.sql"
 
 def get_database_path():
-    return Path(__file__).resolve().parent.parent / "instance" / "data.db"
+    return BASE_DIR.parent / "instance" / "data.db"
 
 DATABASE_PATH = get_database_path()
 
