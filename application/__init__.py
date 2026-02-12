@@ -1,3 +1,4 @@
+import os
 from flask import Flask
 from application import database
 from display import Display
@@ -13,6 +14,15 @@ def init_app():
     register(exit_app)
 
     app = Flask(__name__)
+
+    # enable instance relative configuration
+    app = Flask(__name__, instance_relative_config=True)
+
+    # ensure the instance folder exists
+    try:
+        os.makedirs(app.instance_path)
+    except OSError:
+        pass
 
     database.init_app(app)
 
