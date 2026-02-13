@@ -16,7 +16,7 @@ import monitor
 from pathlib import Path
 
 BASE_DIR = Path(__file__).resolve().parent
-IMAGE_PATH = BASE_DIR / "instance" / "image.jpeg"
+IMAGE_PATH = BASE_DIR.parent / "instance" / "image.jpeg"
 CSV_PATH = BASE_DIR / "data.csv"
 
 def get_connection_strength():
@@ -118,6 +118,10 @@ def log_data():
 def capture_image():
      run(['rpicam-still', '--nopreview', '--output', IMAGE_PATH])
      return redirect(url_for('index'))
+
+@app.route('/get_image')
+def get_image():
+    return send_file(IMAGE_PATH, mimetype='image/jpeg')
 
 @app.route('/delete_image')
 def delete_image():
