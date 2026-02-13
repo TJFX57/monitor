@@ -12,17 +12,12 @@ from subprocess import run
 from socket import gethostname
 import csv
 import monitor
-from display import Display
 
 from pathlib import Path
 
 BASE_DIR = Path(__file__).resolve().parent
-
-def get_image_path():
-    return BASE_DIR / "instance" / "image.jpeg"
-
+IMAGE_PATH = BASE_DIR / "instance" / "image.jpeg"
 CSV_PATH = BASE_DIR / "data.csv"
-IMAGE_PATH = get_image_path()
 
 def get_connection_strength():
     link_start = 'Link Quality='

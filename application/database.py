@@ -4,18 +4,13 @@ from flask import g
 from pathlib import Path
 
 BASE_DIR = Path(__file__).resolve().parent
-
 DATABASE_SCHEMA_PATH = BASE_DIR / "schema.sql"
-
-def get_database_path():
-    return BASE_DIR.parent / "instance" / "data.db"
-
-DATABASE_PATH = get_database_path()
+DATABASE_PATH = BASE_DIR.parent / "instance" / "data.db"
 
 def get_database():
     database = getattr(g, '_database', None) 
     if database is None:
-        database = g._database = sqlite3.connect(get_database_path())
+        database = g._database = sqlite3.connect(DATABASE_PATH)
         database.row_factory = sqlite3.Row
     return database
 

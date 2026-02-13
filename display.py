@@ -3,10 +3,9 @@ import json
 from pathlib import Path
 
 BASE_DIR = Path(__file__).resolve().parent
+JSON_PATH = BASE_DIR / "instance" / "display.json"
 
-JSON_PATH = BASE_DIR / "display.json"
-
-# LED RBG colours.
+# LED RBG colours
 RED     = [255, 0, 0]
 GREEN   = [0, 255, 0]
 BLUE    = [0, 0, 255]
@@ -38,12 +37,12 @@ class Display():
         else:
             self._set_light(self._mode, colour=CLEAR)
 
-    # Sets all LEDs to the saved values.
+    # Sets all LEDs to the saved values
     def _set_display(self):
         for key_led_index, value_colour in self._state.items():
             self._set_light(key_led_index, value_colour)
 
-    # Set read/write/server LED to given colour.
+    # Set read/write/server LED to given colour
     def _set_light(self, led_index, colour):
         try:
             self._light_output.setPixel(led_index, colour)
@@ -53,7 +52,7 @@ class Display():
         except:
             pass
 
-    # Read saved display state from JSON file.
+    # Read saved display state from JSON file
     def _read_state(self):
         state = {}
         try:
@@ -70,7 +69,7 @@ class Display():
         finally:
             return state
 
-    # Write display state to JSON file.
+    # Write display state to JSON file
     def _write_state(self):
         with open(JSON_PATH, 'w') as file:
             json.dump(self._state, file)

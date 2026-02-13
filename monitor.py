@@ -9,19 +9,14 @@ from PiicoDev_BME280 import PiicoDev_BME280
 from PiicoDev_VEML6030 import PiicoDev_VEML6030
 from PiicoDev_TMP117 import PiicoDev_TMP117
 from pathlib import Path
+from math import isnan
 
 BASE_DIR = Path(__file__).resolve().parent
-
-def get_database_path():
-    return Path(__file__).resolve().parent / "instance" / "data.db"
-
-DATABASE_PATH = get_database_path()
+DATABASE_PATH = BASE_DIR / "instance" / "data.db"
 DATABASE_SCHEMA_PATH = BASE_DIR / "application" / "schema.sql"
 
 def get_time():
     return datetime.now().strftime('%Y-%m-%d %H:%M:%S.%f')[:-3]
-
-from math import isnan
 
 def get_temperature(sensor):
     if isinstance(sensor, PiicoDev_TMP117):
@@ -109,7 +104,7 @@ def write_data(data: tuple, mode='a'):
                 raise e
 
 if __name__ == '__main__':
-    # Initialize the input argument parser, add and parse input arguments.
+    # Initialize the input argument parser, add and parse input arguments
     parser = argparse.ArgumentParser(description="Monitor")
     parser.add_argument('-r', '--read', help="read measurements to terminal", action='store_true')
     parser.add_argument('-w', '--write', help="write measurements to file", action='store_true')
