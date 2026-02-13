@@ -121,11 +121,14 @@ def capture_image():
 
 @app.route('/get_image')
 def get_image():
+    if not IMAGE_PATH.exists():
+        return "No image available", 404
     return send_file(IMAGE_PATH, mimetype='image/jpeg')
 
 @app.route('/delete_image')
 def delete_image():
-    run(['rm', IMAGE_PATH])
+    if IMAGE_PATH.exists():
+        IMAGE_PATH.unlink()
     return redirect(url_for('index'))
 
 @app.route('/reboot_monitor')
