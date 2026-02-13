@@ -3,6 +3,7 @@ from flask import render_template
 from flask import send_file
 from flask import redirect
 from flask import url_for
+from flask import flash
 
 from application import database
 
@@ -88,35 +89,57 @@ def index():
 
 @app.route('/logging_ability')
 def change_logging_ability():
-    job, cron = get_logging_job()
-    if job.is_enabled():
-        job.enable(False)
-    else:
-        job.enable()
-    cron.write()
+    try:
+        job, cron = get_logging_job()
+        if job.is_enabled():
+            job.enable(False)
+        else:
+            job.enable()
+        cron.write()
+        flash('Logging ability changed', 'success')
+    except Exception as e:
+        flash(f'Error changing logging ability: {str(e)}', 'error')
     return redirect(url_for('index'))
 
 @app.route('/download_data') #TODO Stream file rather than create an intermediate file & add header to CSV
 def download_data():
-        rows = database.query_database('SELECT * FROM measurements', names=True)
-        with open(CSV_PATH, mode='w', newline='') as file:
-            writer = csv.writer(file)
-            writer.writerows(rows)
-        return send_file(CSV_PATH, mimetype='text/csv', as_attachment=True, max_age=0)
+        try:
+            CSV_PATH.parent.mkdir(parents=True, exist_ok=True)
+            rows = database.query_database('SELECT * FROM measurements', names=True)
+            with open(CSV_PATH, mode='w', newline='') as file:
+                writer = csv.writer(file)
+                writer.writerows(rows)
+            return send_file(CSV_PATH, mimetype='text/csv', as_attachment=True, max_age=0)
+        except Exception as e:
+            flash(f'Error downloading data: {str(e)}', 'error')
+            return redirect(url_for('index'))
 
 @app.route('/delete_data')
 def delete_data():
-    database.execute_database('DELETE FROM measurements')
+    try:
+        database.execute_database('DELETE FROM measurements')
+        flash('Data deleted successfully', 'success')
+    except Exception as e:
+        flash(f'Error deleting data: {str(e)}', 'error')
     return redirect(url_for('index'))
 
 @app.route('/log_data')
 def log_data():
-    monitor.write_data(monitor.read_data(), mode='m')
+    try:
+        monitor.write_data(monitor.read_data(), mode='m')
+        flash('Data logged successfully', 'success')
+    except Exception as e:
+        flash(f'Error logging data: {str(e)}', 'error')
     return redirect(url_for('index'))
 
 @app.route('/capture_image')
 def capture_image():
-     run(['rpicam-still', '--nopreview', '--output', IMAGE_PATH])
+     try:
+         IMAGE_PATH.parent.mkdir(parents=True, exist_ok=True)
+         run(['rpicam-still', '--nopreview', '--output', str(IMAGE_PATH)], check=True)
+         flash('Image captured successfully', 'success')
+     except Exception as e:
+         flash(f'Error capturing image: {str(e)}', 'error')
      return redirect(url_for('index'))
 
 @app.route('/get_image')
@@ -127,16 +150,28 @@ def get_image():
 
 @app.route('/delete_image')
 def delete_image():
-    if IMAGE_PATH.exists():
-        IMAGE_PATH.unlink()
+    try:
+        if IMAGE_PATH.exists():
+            IMAGE_PATH.unlink()
+        flash('Image deleted successfully', 'success')
+    except Exception as e:
+        flash(f'Error deleting image: {str(e)}', 'error')
     return redirect(url_for('index'))
 
 @app.route('/reboot_monitor')
 def reboot_monitor():
-    run(["sudo", "shutdown", "-r", "1"])
+    try:
+        run(["sudo", "shutdown", "-r", "1"], check=True)
+        flash('System rebooting...', 'success')
+    except Exception as e:
+        flash(f'Error rebooting: {str(e)}', 'error')
     return redirect(url_for('index'))
 
 @app.route('/update_monitor')
 def update_monitor():
-    run(["git", "pull"], cwd=BASE_DIR)
+    try:
+        run(["git", "pull"], cwd=BASE_DIR, check=True)
+        flash('Updates pulled successfully', 'success')
+    except Exception as e:
+        flash(f'Error updating: {str(e)}', 'error')
     return redirect(url_for('index'))

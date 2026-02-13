@@ -10,12 +10,15 @@ Chart.defaults.plugins.legend.display = false;
 
 // Moving average function to smooth data
 function movingAverage(data, windowSize = 60) {
-	return data.map((_, i) => {
-		const start = Math.max(0, i - Math.floor(windowSize / 2));
-		const end = Math.min(data.length, i + Math.ceil(windowSize / 2));
-		const subset = data.slice(start, end);
-		return subset.reduce((a, b) => a + b) / subset.length;
-	});
+    // Reduce window size for small datasets
+    const adjustedWindowSize = Math.max(1, Math.min(windowSize, Math.ceil(data.length / 3)));
+    
+    return data.map((_, i) => {
+        const start = Math.max(0, i - Math.floor(adjustedWindowSize / 2));
+        const end = Math.min(data.length, i + Math.ceil(adjustedWindowSize / 2));
+        const subset = data.slice(start, end);
+        return subset.reduce((a, b) => a + b) / subset.length;
+    });
 }
 
 // Apply moving average to all datasets
