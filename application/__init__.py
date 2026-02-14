@@ -17,6 +17,9 @@ def init_app():
 
     # enable instance relative configuration
     app = Flask(__name__, instance_relative_config=True)
+    
+    # set secret key for sessions and flash messages
+    app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY', 'dev-secret-key-change-in-production')
 
     # ensure the instance folder exists
     try:
