@@ -15,6 +15,7 @@ from socket import gethostname
 import csv
 import monitor
 import re
+import exifread
 
 from pathlib import Path
 
@@ -43,20 +44,29 @@ def get_version_hash():
     except Exception:
         return "unknown"
 
+def get_date_taken(path):
+    with open(path, 'rb') as fh:
+        tags = exifread.process_file(fh, stop_tag="EXIF DateTimeOriginal")
+        dateTaken = tags.get("EXIF DateTimeOriginal")
+        if dateTaken:
+            return dateTaken
+        else:
+            return "No EXIF date/time found"
+
 @app.route('/')
 def index():
     job, _ = get_logging_job()
     wifi_quality, wifi_strength = get_connection_strength()
     version = get_version_hash()
     date_time, temperature, pressure, humidity, light = monitor.read_data()
-
-    rows = database.query_database('SELECT * FROM measurements ORDER BY "date time" ASC LIMIT 1440')
-
     time_data = []
     temperature_data = []
     pressure_data = []
     humidity_data = []
     light_data = []
+    image_captured = get_date_taken(IMAGE_PATH)
+
+    rows = database.query_database('SELECT * FROM measurements ORDER BY "date time" ASC LIMIT 1440')
 
     for row in rows:
         time_data.append(row[0][11:16])
@@ -81,7 +91,8 @@ def index():
         wifi_quality = wifi_quality,
         wifi_strength = wifi_strength,
         hostname = gethostname(),
-        version = version)
+        version = version,
+        image_captured = image_captured)
 
 @app.route('/logging_ability')
 def change_logging_ability():
@@ -128,17 +139,38 @@ def log_data():
         flash(f'Error logging data: {str(e)}', 'error')
     return redirect(url_for('index'))
 
+from datetime import datetime
+
 @app.route('/capture_image', methods=['POST'])
 def capture_image_api():
     try:
+        # Create the timestamp BEFORE capturing
+        now = datetime.now()
+        timestamp_str = now.strftime('%Y-%m-%d %H:%M:%S')
+        
+        # Capture the image
         IMAGE_PATH.parent.mkdir(parents=True, exist_ok=True)
-        run(['rpicam-still', '--nopreview', '--output', str(IMAGE_PATH)], check=True)
-        flash('Image captured successfully', 'success')
-        return jsonify(success=True)
+        run([
+            'rpicam-still',
+            '--nopreview',
+            '--immediate',
+            '--width', '1280',
+            '--height', '1000',
+            '--quality', '70',
+            # Force the camera to include the same timestamp in the EXIF
+            '--exif', f'EXIF.DateTimeOriginal={timestamp_str}',
+            '--output', str(IMAGE_PATH)
+        ], check=True)
+
+        # Return the timestamp we already have
+        return jsonify({
+            'status': 'success', 
+            'message': 'Image captured',
+            'image_captured': timestamp_str 
+        }), 200
 
     except Exception as e:
-        flash(f'Error capturing image: {str(e)}', 'error')
-        return jsonify(success=False, error=str(e)), 500
+        return jsonify({'status': 'error', 'message': str(e)}), 500
 
 
 @app.route('/get_image')
