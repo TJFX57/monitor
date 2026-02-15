@@ -1,13 +1,14 @@
 # Monitor
 
-Monitor is a program to monitor the environment via sensors attached to a raspberry pi
+Monitor is a program to monitor the environment via sensors attached to a raspberry pi with data viewable via a web interface
 
 ## Installation
 
 git clone https://github.com/TJFX57/monitor.git
 create venv
+install cronjobs
 install requirements.txt
-activiate i2c on pi
+activate i2c on pi
 reboot
 
 
@@ -18,3 +19,4 @@ python3 monitor.py -r -> read measurements to terminal
 ## Todo
 - Use systemd instead of cron
 - make display useable on it's own
+- update should check the requirements list and update if needed

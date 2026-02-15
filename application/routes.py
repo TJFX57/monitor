@@ -45,13 +45,17 @@ def get_version_hash():
         return "unknown"
 
 def get_date_taken(path):
-    with open(path, 'rb') as fh:
-        tags = exifread.process_file(fh, stop_tag="EXIF DateTimeOriginal")
-        dateTaken = tags.get("EXIF DateTimeOriginal")
-        if dateTaken:
-            return dateTaken
-        else:
-            return "No EXIF date/time found"
+    try:
+        with open(path, 'rb') as fh:
+            tags = exifread.process_file(fh, stop_tag="EXIF DateTimeOriginal")
+            return tags.get("EXIF DateTimeOriginal", "No EXIF date/time found")
+
+    except FileNotFoundError:
+        return "File not found"
+    except OSError as e:
+        return f"File open error: {e}"
+    except Exception as e:
+        return f"EXIF read error: {e}"
 
 @app.route('/')
 def index():

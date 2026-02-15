@@ -84,6 +84,12 @@
                 <h2>Light</h2>
             </div>
             <div class="pannel-content">
+                <label for="checkbox-lights-ability">
+                    <input type="checkbox" id="checkbox-lights-ability" href=""
+                        {{ "checked" if live_view}}>Lights
+                </label>
+            </div>
+            <div class="pannel-content">
                 <p id="light">Currently: {{ light }}lx</p>
             </div>
             <div class="pannel-content">
@@ -99,6 +105,10 @@
             <div class="pannel-content">
                 <a href="#" onclick="captureImage(); return false;" title="Capture image">Capture</a>
                 <a href="{{ url_for('delete_image') }}" title="Delete image">Delete</a>
+                <label for="checkbox-live-view">
+                    <input type="checkbox" id="checkbox-live-view" href=""
+                        {{ "checked" if live_view}}>Live View
+                </label>
             </div>
             <div class="pannel-content">
                 <p id="image-captured">Captured: {{ image_captured }}</p>
