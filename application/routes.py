@@ -70,7 +70,7 @@ def index():
     light_data = []
     image_captured = get_date_taken(IMAGE_PATH)
 
-    rows = database.query_database('SELECT * FROM measurements ORDER BY "date time" ASC LIMIT 1440')
+    rows = database.query_database('SELECT * FROM measurements ORDER BY "date time" DESC LIMIT 1440')
 
     for row in rows:
         time_data.append(row[0][11:16])
