@@ -134,8 +134,12 @@ def capture_image_api():
         IMAGE_PATH.parent.mkdir(parents=True, exist_ok=True)
         run(['rpicam-still', '--nopreview', '--output', str(IMAGE_PATH)], check=True)
         flash('Image captured successfully', 'success')
+        return jsonify(success=True)
+
     except Exception as e:
         flash(f'Error capturing image: {str(e)}', 'error')
+        return jsonify(success=False, error=str(e)), 500
+
 
 @app.route('/get_image')
 def get_image():
