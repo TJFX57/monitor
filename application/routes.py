@@ -128,24 +128,14 @@ def log_data():
         flash(f'Error logging data: {str(e)}', 'error')
     return redirect(url_for('index'))
 
-@app.route('/capture_image')
-def capture_image():
-     try:
-         IMAGE_PATH.parent.mkdir(parents=True, exist_ok=True)
-         run(['rpicam-still', '--nopreview', '--output', str(IMAGE_PATH)], check=True)
-         flash('Image captured successfully', 'success')
-     except Exception as e:
-         flash(f'Error capturing image: {str(e)}', 'error')
-     return redirect(url_for('index'))
-
-@app.route('/capture_image_api', methods=['POST'])
+@app.route('/capture_image', methods=['POST'])
 def capture_image_api():
     try:
         IMAGE_PATH.parent.mkdir(parents=True, exist_ok=True)
         run(['rpicam-still', '--nopreview', '--output', str(IMAGE_PATH)], check=True)
-        return jsonify({'status': 'success', 'message': 'Image captured'}), 200
+        flash('Image captured successfully', 'success')
     except Exception as e:
-        return jsonify({'status': 'error', 'message': str(e)}), 500
+        flash(f'Error capturing image: {str(e)}', 'error')
 
 @app.route('/get_image')
 def get_image():

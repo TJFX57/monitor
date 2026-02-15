@@ -97,17 +97,12 @@
                 <h2>Monitor View </h2>
             </div>
             <div class="pannel-content">
-                <a href="{{ url_for('capture_image') }}" title="Capture image">Capture</a>
+                <button onclick="captureImage()">Capture</button>
                 <a href="{{ url_for('delete_image') }}" title="Delete image">Delete</a>
             </div>
             <div class="pannel-content">
-                <img src="{{ url_for('get_image') }}">
+                <img id="captured-image" src="/get_image" alt="Captured image">
             </div>
-        </div>
-
-        <button onclick="captureImage()">Capture Image</button>
-        <div id="image-container">
-            <img id="captured-image" src="/get_image" alt="Captured image">
         </div>
 
         <!-- Monitor -->

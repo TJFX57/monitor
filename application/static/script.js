@@ -1,5 +1,5 @@
 function captureImage() {
-    fetch('/capture_image_api', { method: 'POST' })
+    fetch('/capture_image', { method: 'POST' })
         .then(response => {
             if (response.ok) {
                 // Refresh just the image by adding a timestamp to bust cache
