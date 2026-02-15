@@ -103,7 +103,12 @@
             <div class="pannel-content">
                 <img src="{{ url_for('get_image') }}">
             </div>
-        </div> 
+        </div>
+
+        <button onclick="captureImage()">Capture Image</button>
+        <div id="image-container">
+            <img id="captured-image" src="/get_image" alt="Captured image">
+        </div>
 
         <!-- Monitor -->
         <div class="pannel">

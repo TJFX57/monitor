@@ -4,6 +4,7 @@ from flask import send_file
 from flask import redirect
 from flask import url_for
 from flask import flash
+from flask import jsonify
 
 from application import database
 
@@ -13,31 +14,22 @@ from subprocess import run
 from socket import gethostname
 import csv
 import monitor
+import re
 
 from pathlib import Path
 
 BASE_DIR = Path(__file__).resolve().parent
 IMAGE_PATH = BASE_DIR.parent / "instance" / "image.jpeg"
-CSV_PATH = BASE_DIR / "data.csv"
+CSV_PATH = BASE_DIR.parent / "instance" / "data.csv"
 
 def get_connection_strength():
-    link_start = 'Link Quality='
-    link_end = '/70'
-    signal_start = 'Signal level='
-    signal_end   = ' dBm'
-
-    result = run(['iwconfig','wlan0'], text=True, capture_output=True)
-
-    link_index_start = result.stdout.find(link_start)
-    link_index_end = result.stdout.find(link_end, link_index_start)
-    signal_index_start = result.stdout.find(signal_start)
-    signal_index_end = result.stdout.find(signal_end, signal_index_start)
-    index_link_start = link_index_start+len(link_start)
-    index_link_end = link_index_end
-    index_signal_start = signal_index_start+len(signal_start)
-    index_signal_end = signal_index_end
-
-    return(int(result.stdout[index_link_start:index_link_end]), int(result.stdout[index_signal_start:index_signal_end]))
+    try:
+        result = run(['iwconfig', 'wlan0'], text=True, capture_output=True, check=True)
+        quality = int(re.search(r'Link Quality=(\d+)', result.stdout).group(1))
+        strength = int(re.search(r'Signal level=(-?\d+)', result.stdout).group(1))
+        return quality, strength
+    except Exception:
+        return 0, 0
 
 def get_logging_job():
     cron = CronTab(user=getlogin())
@@ -45,7 +37,11 @@ def get_logging_job():
         return job, cron
 
 def get_version_hash():
-    return run(['git', 'rev-parse', '--short', 'main'], cwd=BASE_DIR, text=True, capture_output=True).stdout
+    try:
+        result = run(['git', 'rev-parse', '--short', 'main'], cwd=BASE_DIR, text=True, capture_output=True, check=True)
+        return result.stdout.strip()
+    except Exception:
+        return "unknown"
 
 @app.route('/')
 def index():
@@ -54,7 +50,7 @@ def index():
     version = get_version_hash()
     date_time, temperature, pressure, humidity, light = monitor.read_data()
 
-    rows = database.query_database('SELECT * FROM measurements ORDER BY "date time" DESC LIMIT 1440')
+    rows = database.query_database('SELECT * FROM measurements ORDER BY "date time" ASC LIMIT 1440')
 
     time_data = []
     temperature_data = []
@@ -63,11 +59,11 @@ def index():
     light_data = []
 
     for row in rows:
-        time_data.insert(0, row[0][11:16])
-        temperature_data.insert(0, row[1])
-        pressure_data.insert(0, row[2])
-        humidity_data.insert(0, row[3])
-        light_data.insert(0, row[4])
+        time_data.append(row[0][11:16])
+        temperature_data.append(row[1])
+        pressure_data.append(row[2])
+        humidity_data.append(row[3])
+        light_data.append(row[4])
 
     return render_template(
         'index.html',
@@ -141,6 +137,15 @@ def capture_image():
      except Exception as e:
          flash(f'Error capturing image: {str(e)}', 'error')
      return redirect(url_for('index'))
+
+@app.route('/capture_image_api', methods=['POST'])
+def capture_image_api():
+    try:
+        IMAGE_PATH.parent.mkdir(parents=True, exist_ok=True)
+        run(['rpicam-still', '--nopreview', '--output', str(IMAGE_PATH)], check=True)
+        return jsonify({'status': 'success', 'message': 'Image captured'}), 200
+    except Exception as e:
+        return jsonify({'status': 'error', 'message': str(e)}), 500
 
 @app.route('/get_image')
 def get_image():
