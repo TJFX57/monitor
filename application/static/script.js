@@ -12,7 +12,7 @@ function captureImage() {
                 // Update the timestamp text
                 const timeLabel = document.getElementById('image-captured');
                 if (timeLabel) {
-                    timeLabel.textContent = 'Image captured: ' + data.image_captured;
+                    timeLabel.textContent = 'Captured: ' + data.image_captured;
                 }
             }
         })
