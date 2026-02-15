@@ -97,11 +97,11 @@
                 <h2>Monitor View </h2>
             </div>
             <div class="pannel-content">
-                <p id="image-captured">Captured: {{ image_captured }}</p>
-            </div>
-            <div class="pannel-content">
                 <a href="#" onclick="captureImage(); return false;" title="Capture image">Capture</a>
                 <a href="{{ url_for('delete_image') }}" title="Delete image">Delete</a>
+            </div>
+            <div class="pannel-content">
+                <p id="image-captured">Captured: {{ image_captured }}</p>
             </div>
             <div class="pannel-content">
                 <img id="captured-image" src="/get_image" alt="Captured image">
