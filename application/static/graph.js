@@ -64,19 +64,6 @@ async function liveUpdateCharts() {
             ].forEach(chart => chart.update('none'));
         }
 
-        // ✅ update displayed measurements
-        document.getElementById('temperature').textContent =
-            `Currently: ${data.temperature}°C`;
-
-        document.getElementById('pressure').textContent =
-            `Currently: ${data.pressure}HPa`;
-
-        document.getElementById('humidity').textContent =
-            `Currently: ${data.humidity}RH`;
-
-        document.getElementById('light').textContent =
-            `Currently: ${data.light}lx`;
-
     } catch (err) {
         console.error("Live update failed:", err);
     }
