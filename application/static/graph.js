@@ -8,6 +8,36 @@ Chart.defaults.borderColor = 'lightslategray';
 Chart.defaults.elements.point.pointStyle = false;
 Chart.defaults.plugins.legend.display = false;
 
+function pushAndScroll(chart, label, value, maxPoints = 1440) {
+    chart.data.labels.push(label);
+    chart.data.datasets[0].data.push(value);
+
+    if (chart.data.labels.length > maxPoints) {
+        chart.data.labels.shift();
+        chart.data.datasets[0].data.shift();
+    }
+
+    chart.update();
+}
+
+async function updateCharts() {
+    try {
+        const res = await fetch('/latest');
+        const data = await res.json();
+
+        pushAndScroll(temperatureChartInstance, data.time, data.temperature);
+        pushAndScroll(pressureChartInstance, data.time, data.pressure);
+        pushAndScroll(humidityChartInstance, data.time, data.humidity);
+        pushAndScroll(lightChartInstance, data.time, data.light);
+
+    } catch (err) {
+        console.error("Live update failed:", err);
+    }
+}
+
+// update every 10 seconds
+setInterval(updateCharts, 10000);
+
 const temperatureChartInstance = new Chart(temperatureChart, {
 	type: 'line',
 	data: {

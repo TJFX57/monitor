@@ -70,7 +70,11 @@ def index():
     light_data = []
     image_captured = get_date_taken(IMAGE_PATH)
 
-    rows = database.query_database('SELECT * FROM measurements ORDER BY "date time" DESC LIMIT 1440')
+    # get the latest 1440 elements (as 1 recording a minute) and reverse
+    rows = database.query_database(
+        'SELECT * FROM measurements ORDER BY "date time" DESC LIMIT 1440'
+        )
+    rows.reverse()
 
     for row in rows:
         time_data.append(row[0][11:16])
@@ -97,6 +101,20 @@ def index():
         hostname = gethostname(),
         version = version,
         image_captured = image_captured)
+
+@app.route('/latest')
+def latest():
+    row = database.query_database(
+        'SELECT * FROM measurements ORDER BY "date time" DESC LIMIT 1'
+    )[0]
+
+    return {
+        "time": row[0][11:16],
+        "temperature": row[1],
+        "pressure": row[2],
+        "humidity": row[3],
+        "light": row[4]
+    }
 
 @app.route('/logging_ability')
 def change_logging_ability():
