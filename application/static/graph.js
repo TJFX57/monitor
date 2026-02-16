@@ -8,27 +8,74 @@ Chart.defaults.borderColor = 'lightslategray';
 Chart.defaults.elements.point.pointStyle = false;
 Chart.defaults.plugins.legend.display = false;
 
-function pushAndScroll(chart, label, value, maxPoints = 1440) {
-    chart.data.labels.push(label);
+// ---------- helpers ----------
+
+function pushData(chart, value, maxPoints = 1440) {
     chart.data.datasets[0].data.push(value);
 
-    if (chart.data.labels.length > maxPoints) {
-        chart.data.labels.shift();
+    if (chart.data.datasets[0].data.length > maxPoints) {
         chart.data.datasets[0].data.shift();
     }
-
-    chart.update();
 }
 
-async function updateCharts() {
+function pushLabelToAll(label, maxPoints = 1440) {
+    const charts = [
+        temperatureChartInstance,
+        pressureChartInstance,
+        humidityChartInstance,
+        lightChartInstance
+    ];
+
+    charts.forEach(chart => {
+        chart.data.labels.push(label);
+
+        if (chart.data.labels.length > maxPoints) {
+            chart.data.labels.shift();
+        }
+    });
+}
+
+// ---------- live updates ----------
+
+async function liveUpdateCharts() {
     try {
         const res = await fetch('/latest');
         const data = await res.json();
 
-        pushAndScroll(temperatureChartInstance, data.time, data.temperature);
-        pushAndScroll(pressureChartInstance, data.time, data.pressure);
-        pushAndScroll(humidityChartInstance, data.time, data.humidity);
-        pushAndScroll(lightChartInstance, data.time, data.light);
+        const lastLabel = temperatureChartInstance.data.labels.at(-1);
+
+        if (data.time !== lastLabel) {
+
+            // update shared timeline
+            pushLabelToAll(data.time);
+
+            // update datasets
+            pushData(temperatureChartInstance, data.temperature);
+            pushData(pressureChartInstance, data.pressure);
+            pushData(humidityChartInstance, data.humidity);
+            pushData(lightChartInstance, data.light);
+
+            // redraw charts
+            [
+                temperatureChartInstance,
+                pressureChartInstance,
+                humidityChartInstance,
+                lightChartInstance
+            ].forEach(chart => chart.update('none'));
+        }
+
+        // ✅ update displayed measurements
+        document.getElementById('temperature').textContent =
+            `Currently: ${data.temperature}°C`;
+
+        document.getElementById('pressure').textContent =
+            `Currently: ${data.pressure}HPa`;
+
+        document.getElementById('humidity').textContent =
+            `Currently: ${data.humidity}RH`;
+
+        document.getElementById('light').textContent =
+            `Currently: ${data.light}lx`;
 
     } catch (err) {
         console.error("Live update failed:", err);
@@ -36,54 +83,54 @@ async function updateCharts() {
 }
 
 // update every 10 seconds
-setInterval(updateCharts, 10000);
+setInterval(liveUpdateCharts, 10000);
+
+// ---------- chart creation ----------
 
 const temperatureChartInstance = new Chart(temperatureChart, {
-	type: 'line',
-	data: {
-		labels: timeData,
-		datasets: [{
-			data: temperatureData,
-			tension: 0.4,
-			cubicInterpolationMode: 'monotone'
-		}]
-	}
+    type: 'line',
+    data: {
+        labels: [...timeData],
+        datasets: [{
+            data: temperatureData,
+            tension: 0.4,
+            cubicInterpolationMode: 'monotone'
+        }]
+    }
 });
 
 const pressureChartInstance = new Chart(pressureChart, {
-	type: 'line',
-	data: {
-		labels: timeData,
-		datasets: [{
-			data: pressureData,
-			tension: 0.4,
-			cubicInterpolationMode: 'monotone'
-		}]
-	}
+    type: 'line',
+    data: {
+        labels: [...timeData],
+        datasets: [{
+            data: pressureData,
+            tension: 0.4,
+            cubicInterpolationMode: 'monotone'
+        }]
+    }
 });
 
 const humidityChartInstance = new Chart(humidityChart, {
-	type: 'line',
-	data: {
-		labels: timeData,
-		datasets: [{
-			data: humidityData,
-			tension: 0.4,
-			cubicInterpolationMode: 'monotone'
-
-		}]
-	}
+    type: 'line',
+    data: {
+        labels: [...timeData],
+        datasets: [{
+            data: humidityData,
+            tension: 0.4,
+            cubicInterpolationMode: 'monotone'
+        }]
+    }
 });
 
 const lightChartInstance = new Chart(lightChart, {
-	type: 'line',
-	data: {
-		labels: timeData,
-		datasets: [{
-			data: lightData,
-			tension: 0.4,
-			cubicInterpolationMode: 'monotone'
-
-		}]
-	}
+    type: 'line',
+    data: {
+        labels: [...timeData],
+        datasets: [{
+            data: lightData,
+            tension: 0.4,
+            cubicInterpolationMode: 'monotone'
+        }]
+    }
 });

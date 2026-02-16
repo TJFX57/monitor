@@ -116,6 +116,19 @@ def latest():
         "light": row[4]
     }
 
+@app.route('/status')
+def status():
+    wifi_quality, wifi_strength = get_connection_strength()
+    date_time, temperature, pressure, humidity, light = monitor.read_data()
+    return {
+        "temperature": temperature,
+        "pressure": pressure,
+        "humidity": humidity,
+        "light": light,
+        "wifi_quality": wifi_quality,
+        "wifi_strength": wifi_strength
+    }
+
 @app.route('/logging_ability')
 def change_logging_ability():
     try:
