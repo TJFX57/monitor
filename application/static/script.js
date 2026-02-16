@@ -15,6 +15,9 @@ async function updateLiveMeasurements() {
         document.getElementById('light').textContent =
             `Currently: ${data.light}lx`;
 
+        // update time update
+        document.getElementById('last-update').textContent = `${new Date().toLocaleTimeString()}`;
+
         // update WiFi
         document.getElementById('wifi-quality').textContent =
             `${data.wifi_quality}/70`;
