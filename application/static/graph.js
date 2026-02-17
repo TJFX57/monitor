@@ -101,55 +101,7 @@ async function liveUpdateCharts() {
 // update every 10 seconds
 setInterval(liveUpdateCharts, 10000);
 
-// ---------- chart creation ----------
-
-const temperatureChartInstance = new Chart(temperatureChart, {
-    type: 'line',
-    data: {
-        labels: [...timeData],
-        datasets: [{
-            data: temperatureData,
-            tension: 0.4,
-            cubicInterpolationMode: 'monotone'
-        }]
-    }
-});
-
-const pressureChartInstance = new Chart(pressureChart, {
-    type: 'line',
-    data: {
-        labels: [...timeData],
-        datasets: [{
-            data: pressureData,
-            tension: 0.4,
-            cubicInterpolationMode: 'monotone'
-        }]
-    }
-});
-
-const humidityChartInstance = new Chart(humidityChart, {
-    type: 'line',
-    data: {
-        labels: [...timeData],
-        datasets: [{
-            data: humidityData,
-            tension: 0.4,
-            cubicInterpolationMode: 'monotone'
-        }]
-    }
-});
-
-const lightChartInstance = new Chart(lightChart, {
-    type: 'line',
-    data: {
-        labels: [...timeData],
-        datasets: [{
-            data: lightData,
-            tension: 0.4,
-            cubicInterpolationMode: 'monotone'
-        }]
-    }
-});
+// ---------- chart data selection ---------
 
 document.addEventListener("DOMContentLoaded", () => {
 
@@ -170,3 +122,91 @@ document.addEventListener("DOMContentLoaded", () => {
     });
 
 });
+
+// ---------- chart creation ----------
+
+const temperatureChartInstance = new Chart(temperatureChart, {
+    type: 'line',
+    data: {
+        labels: [...timeData],
+        datasets: [{
+            data: temperatureData,
+            tension: 0.4,
+            cubicInterpolationMode: 'monotone'
+        }]
+    },
+    options: JSON.parse(JSON.stringify(commonOptions))
+});
+
+const pressureChartInstance = new Chart(pressureChart, {
+    type: 'line',
+    data: {
+        labels: [...timeData],
+        datasets: [{
+            data: pressureData,
+            tension: 0.4,
+            cubicInterpolationMode: 'monotone'
+        }]
+    },
+    options: JSON.parse(JSON.stringify(commonOptions))
+});
+
+const humidityChartInstance = new Chart(humidityChart, {
+    type: 'line',
+    data: {
+        labels: [...timeData],
+        datasets: [{
+            data: humidityData,
+            tension: 0.4,
+            cubicInterpolationMode: 'monotone'
+        }]
+    },
+    options: JSON.parse(JSON.stringify(commonOptions))
+});
+
+const lightChartInstance = new Chart(lightChart, {
+    type: 'line',
+    data: {
+        labels: [...timeData],
+        datasets: [{
+            data: lightData,
+            tension: 0.4,
+            cubicInterpolationMode: 'monotone'
+        }]
+    },
+    options: JSON.parse(JSON.stringify(commonOptions))
+});
+
+const commonOptions = {
+    scales: {
+        x: {
+            type: 'time',            // important for proper formatting
+            time: {
+                parser: 'YYYY-MM-DD HH:mm:ss.SSS',  // match your DB timestamp
+                tooltipFormat: 'MMM D, HH:mm',     // what shows in tooltip
+                displayFormats: {
+                    millisecond: 'HH:mm:ss',
+                    second: 'HH:mm:ss',
+                    minute: 'HH:mm',
+                    hour: 'MMM D HH:mm',
+                    day: 'MMM D',
+                    month: 'MMM YYYY'
+                }
+            },
+            title: {
+                display: true,
+                text: 'Time'
+            },
+            ticks: {
+                autoSkip: true,       // automatically skip some labels
+                maxTicksLimit: 12     // adjust to fit nicely
+            }
+        },
+        y: {
+            beginAtZero: false
+        }
+    },
+    plugins: {
+        legend: { display: false }
+    }
+};
