@@ -92,7 +92,7 @@ def index():
     rows.reverse()
 
     for row in rows:
-        time_data.append(row[0][11:16])
+        time_data.append(row[0][5:16])
         temperature_data.append(row[1])
         pressure_data.append(row[2])
         humidity_data.append(row[3])
@@ -124,7 +124,7 @@ def latest():
     )[0]
 
     return {
-        "time": row[0][11:16],
+        "time": row[0][5:16],
         "temperature": row[1],
         "pressure": row[2],
         "humidity": row[3],
@@ -149,7 +149,7 @@ def data_range():
     light_data = []
 
     for row in rows:
-        time_data.append(row[0][11:16])
+        time_data.append(row[0][5:16])
         temperature_data.append(row[1])
         pressure_data.append(row[2])
         humidity_data.append(row[3])
