@@ -1,4 +1,4 @@
-from flask import current_app as app
+from flask import current_app as app, request
 from flask import render_template
 from flask import send_file
 from flask import redirect
@@ -16,6 +16,7 @@ import csv
 import monitor
 import re
 import exifread
+from datetime import datetime, timedelta
 
 from pathlib import Path
 
@@ -56,6 +57,20 @@ def get_date_taken(path):
         return f"File open error: {e}"
     except Exception as e:
         return f"EXIF read error: {e}"
+
+def get_range_cutoff(range_key):
+    now = datetime.utcnow()
+
+    mapping = {
+        "15m": timedelta(minutes=15),
+        "1h": timedelta(hours=1),
+        "6h": timedelta(hours=6),
+        "24h": timedelta(hours=24),
+        "7d": timedelta(days=7),
+        "30d": timedelta(days=30)
+    }
+
+    return now - mapping.get(range_key, timedelta(hours=1))
 
 @app.route('/')
 def index():
@@ -115,6 +130,38 @@ def latest():
         "humidity": row[3],
         "light": row[4]
     }
+
+@app.route('/data')
+def data_range():
+
+    range_key = request.args.get("range", "1h")
+    cutoff = get_range_cutoff(range_key)
+
+    rows = database.query_database(
+        'SELECT * FROM measurements WHERE "date time" >= ? ORDER BY "date time" ASC',
+        (cutoff.strftime("%Y-%m-%d %H:%M:%S"),)
+    )
+
+    time_data = []
+    temperature_data = []
+    pressure_data = []
+    humidity_data = []
+    light_data = []
+
+    for row in rows:
+        time_data.append(row[0][11:16])
+        temperature_data.append(row[1])
+        pressure_data.append(row[2])
+        humidity_data.append(row[3])
+        light_data.append(row[4])
+
+    return jsonify({
+        "time": time_data,
+        "temperature": temperature_data,
+        "pressure": pressure_data,
+        "humidity": humidity_data,
+        "light": light_data
+    })
 
 @app.route('/status')
 def status():

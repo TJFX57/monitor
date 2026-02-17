@@ -35,7 +35,36 @@ function pushLabelToAll(label, maxPoints = 1440) {
     });
 }
 
+function replaceChartData(data) {
+
+    const charts = [
+        [temperatureChartInstance, data.temperature],
+        [pressureChartInstance, data.pressure],
+        [humidityChartInstance, data.humidity],
+        [lightChartInstance, data.light]
+    ];
+
+    charts.forEach(([chart, values]) => {
+        chart.data.labels = [...data.time];
+        chart.data.datasets[0].data = [...values];
+        chart.update();
+    });
+}
+
 // ---------- live updates ----------
+
+async function loadTimescale(range) {
+
+    try {
+        const res = await fetch(`/data?range=${range}`);
+        const data = await res.json();
+
+        replaceChartData(data);
+
+    } catch (err) {
+        console.error("Failed to load timescale:", err);
+    }
+}
 
 async function liveUpdateCharts() {
     try {
@@ -120,4 +149,24 @@ const lightChartInstance = new Chart(lightChart, {
             cubicInterpolationMode: 'monotone'
         }]
     }
+});
+
+document.addEventListener("DOMContentLoaded", () => {
+
+    const buttons = document.querySelectorAll(".timescale-btn");
+
+    buttons.forEach(button => {
+
+        button.addEventListener("click", () => {
+
+            const range = button.dataset.range;
+
+            buttons.forEach(b => b.classList.remove("active"));
+            button.classList.add("active");
+
+            loadTimescale(range);
+        });
+
+    });
+
 });
