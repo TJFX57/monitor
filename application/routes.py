@@ -85,14 +85,14 @@ def index():
     light_data = []
     image_captured = get_date_taken(IMAGE_PATH)
 
-    # get the latest 1440 elements (as 1 recording a minute) and reverse
+    # get the latest 60 elements (as 1 recording a minute) and reverse
     rows = database.query_database(
-        'SELECT * FROM measurements ORDER BY "date time" DESC LIMIT 1440'
+        'SELECT * FROM measurements ORDER BY "date time" DESC LIMIT 60'
         )
     rows.reverse()
 
     for row in rows:
-        time_data.append(row[0])
+        time_data.append(row[0][11:16])
         temperature_data.append(row[1])
         pressure_data.append(row[2])
         humidity_data.append(row[3])
@@ -117,6 +117,7 @@ def index():
         version = version,
         image_captured = image_captured)
 
+# updates graph data by adding latest logged measurement
 @app.route('/latest')
 def latest():
     row = database.query_database(
@@ -124,13 +125,14 @@ def latest():
     )[0]
 
     return {
-        "time": row[0],
+        "time": row[0][11:16],
         "temperature": row[1],
         "pressure": row[2],
         "humidity": row[3],
         "light": row[4]
     }
 
+# updates graph data on timescale button press
 @app.route('/data')
 def data_range():
 
@@ -149,7 +151,7 @@ def data_range():
     light_data = []
 
     for row in rows:
-        time_data.append(row[0])
+        time_data.append(row[0][11:16])
         temperature_data.append(row[1])
         pressure_data.append(row[2])
         humidity_data.append(row[3])
@@ -274,7 +276,7 @@ def delete_image():
 @app.route('/reboot_monitor')
 def reboot_monitor():
     try:
-        run(["sudo", "shutdown", "-r", "1"], check=True)
+        run(["sudo", "reboot"], check=True)
         flash('System rebooting...', 'success')
     except Exception as e:
         flash(f'Error rebooting: {str(e)}', 'error')

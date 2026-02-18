@@ -1,24 +1,29 @@
-Chart.defaults.color = 'lightgrey';
-Chart.defaults.borderColor = 'lightslategray';
-Chart.defaults.elements.point.pointStyle = false;
-Chart.defaults.plugins.legend.display = false;
-
 const temperatureChart = document.getElementById('temperature-chart');
 const pressureChart = document.getElementById('pressure-chart');
 const humidityChart = document.getElementById('humidity-chart');
 const lightChart = document.getElementById('light-chart');
 
+Chart.defaults.color = 'lightgrey';
+Chart.defaults.borderColor = 'lightslategray';
+Chart.defaults.elements.point.pointStyle = false;
+Chart.defaults.plugins.legend.display = false;
+
 // ---------- helpers ----------
 
-function pushData(chart, value, maxPoints = 1440) {
+function pushLiveData(chart, value, label, maxPoints) {
+    // append data point
     chart.data.datasets[0].data.push(value);
 
-    if (chart.data.datasets[0].data.length > maxPoints) {
-        chart.data.datasets[0].data.shift();
-    }
+    // append label
+    chart.data.labels.push(label);
+
+    // trim oldest if needed
+    while (chart.data.labels.length > maxPoints) chart.data.labels.shift();
+    while (chart.data.datasets[0].data.length > maxPoints) chart.data.datasets[0].data.shift();
 }
 
-function pushLabelToAll(label, maxPoints = 1440) {
+
+function pushLabelToAll(label, maxPoints = 60) {
     const charts = [
         temperatureChartInstance,
         pressureChartInstance,
@@ -75,16 +80,14 @@ async function liveUpdateCharts() {
 
         if (data.time !== lastLabel) {
 
-            // update shared timeline
-            pushLabelToAll(data.time);
+            const maxPoints = temperatureChartInstance.data.labels.length;
 
-            // update datasets
-            pushData(temperatureChartInstance, data.temperature);
-            pushData(pressureChartInstance, data.pressure);
-            pushData(humidityChartInstance, data.humidity);
-            pushData(lightChartInstance, data.light);
+            pushLiveData(temperatureChartInstance, data.temperature, data.time, maxPoints);
+            pushLiveData(pressureChartInstance, data.pressure, data.time, maxPoints);
+            pushLiveData(humidityChartInstance, data.humidity, data.time, maxPoints);
+            pushLiveData(lightChartInstance, data.light, data.time, maxPoints);
 
-            // redraw charts
+            // redraw all
             [
                 temperatureChartInstance,
                 pressureChartInstance,
@@ -98,9 +101,11 @@ async function liveUpdateCharts() {
     }
 }
 
+// update every 10 seconds
+setInterval(liveUpdateCharts, 10000);
+
 // ---------- chart data selection ---------
 
-// listen to see if a timescale button is pressed to change the graphs
 document.addEventListener("DOMContentLoaded", () => {
 
     const buttons = document.querySelectorAll(".timescale-btn");
@@ -119,39 +124,27 @@ document.addEventListener("DOMContentLoaded", () => {
 
     });
 
+    const defaultRange = "1h";
+    const defaultButton = document.querySelector(`[data-range="${defaultRange}"]`);
+
+    if (defaultButton) {
+        defaultButton.classList.add("active");
+        loadTimescale(defaultRange);
+    }
+
 });
-
-// -- chart update --
-
-// update every 10 seconds
-setInterval(liveUpdateCharts, 10000);
 
 // ---------- chart creation ----------
 
 const temperatureChartInstance = new Chart(temperatureChart, {
     type: 'line',
     data: {
-        labels: [...timeData],   // keep raw timestamps
+        labels: [...timeData],
         datasets: [{
             data: temperatureData,
             tension: 0.4,
             cubicInterpolationMode: 'monotone'
         }]
-    },
-    options: {
-        scales: {
-            x: {
-                type: 'time',
-                time: {
-                    displayFormats: {
-                        minute: 'MM-dd HH:mm',
-                        hour: 'MM-dd HH:mm',
-                        day: 'MM-dd HH:mm'
-                    },
-                    tooltipFormat: 'MM-dd HH:mm'
-                }
-            }
-        }
     }
 });
 
