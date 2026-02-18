@@ -1,12 +1,12 @@
-const temperatureChart = document.getElementById('temperature-chart');
-const pressureChart = document.getElementById('pressure-chart');
-const humidityChart = document.getElementById('humidity-chart');
-const lightChart = document.getElementById('light-chart');
-
 Chart.defaults.color = 'lightgrey';
 Chart.defaults.borderColor = 'lightslategray';
 Chart.defaults.elements.point.pointStyle = false;
 Chart.defaults.plugins.legend.display = false;
+
+const temperatureChart = document.getElementById('temperature-chart');
+const pressureChart = document.getElementById('pressure-chart');
+const humidityChart = document.getElementById('humidity-chart');
+const lightChart = document.getElementById('light-chart');
 
 // ---------- helpers ----------
 
@@ -98,9 +98,6 @@ async function liveUpdateCharts() {
     }
 }
 
-// update every 10 seconds
-setInterval(liveUpdateCharts, 10000);
-
 // ---------- chart data selection ---------
 
 // listen to see if a timescale button is pressed to change the graphs
@@ -123,6 +120,11 @@ document.addEventListener("DOMContentLoaded", () => {
     });
 
 });
+
+// -- chart update --
+
+// update every 10 seconds
+setInterval(liveUpdateCharts, 10000);
 
 // ---------- chart creation ----------
 
