@@ -103,6 +103,7 @@ setInterval(liveUpdateCharts, 10000);
 
 // ---------- chart data selection ---------
 
+// listen to see if a timescale button is pressed to change the graphs
 document.addEventListener("DOMContentLoaded", () => {
 
     const buttons = document.querySelectorAll(".timescale-btn");
@@ -128,12 +129,27 @@ document.addEventListener("DOMContentLoaded", () => {
 const temperatureChartInstance = new Chart(temperatureChart, {
     type: 'line',
     data: {
-        labels: [...timeData],
+        labels: [...timeData],   // keep raw timestamps
         datasets: [{
             data: temperatureData,
             tension: 0.4,
             cubicInterpolationMode: 'monotone'
         }]
+    },
+    options: {
+        scales: {
+            x: {
+                type: 'time',
+                time: {
+                    displayFormats: {
+                        minute: 'MM-dd HH:mm',
+                        hour: 'MM-dd HH:mm',
+                        day: 'MM-dd HH:mm'
+                    },
+                    tooltipFormat: 'MM-dd HH:mm'
+                }
+            }
+        }
     }
 });
 
