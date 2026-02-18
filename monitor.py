@@ -9,11 +9,15 @@ from PiicoDev_BME280 import PiicoDev_BME280
 from PiicoDev_VEML6030 import PiicoDev_VEML6030
 from PiicoDev_TMP117 import PiicoDev_TMP117
 from pathlib import Path
-from math import isnan
 
 BASE_DIR = Path(__file__).resolve().parent
 DATABASE_PATH = BASE_DIR / "instance" / "data.db"
 DATABASE_SCHEMA_PATH = BASE_DIR / "application" / "schema.sql"
+
+# Initialise sensors once
+bme280 = PiicoDev_BME280()
+veml6030 = PiicoDev_VEML6030()
+tmp117 = PiicoDev_TMP117()
 
 def get_time():
     return datetime.now().strftime('%Y-%m-%d %H:%M:%S.%f')[:-3]
@@ -58,11 +62,6 @@ def get_light(sensor: PiicoDev_VEML6030): #Does not fault to an error!
 def read_data(sample_size=3):
     with Display(mode='r'):
         try:
-            # Initialise the sensors.
-            bme280 = PiicoDev_BME280()
-            veml6030 = PiicoDev_VEML6030()
-            tmp117 = PiicoDev_TMP117()
-
             # Read and assign initial altitude reading
             zero_alt = bme280.altitude()
 
@@ -80,11 +79,13 @@ def read_data(sample_size=3):
                 pres_HPa_values.append((get_pressure(bme280))/100)
                 hum_RH_values.append(get_humidity(bme280))
                 light_Lx_values.append(get_light(veml6030))
+            
             # Find average of measurement values
             temp_C_ave = round(mean(temp_C_values), 2)
             pres_HPa_ave = round(mean(pres_HPa_values), 2)
             hum_RH_ave = round(mean(hum_RH_values), 2)
             light_Lx_ave = round(mean(light_Lx_values), 2)
+       
         except ValueError as e:
             raise e
 
