@@ -121,18 +121,19 @@ def index():
 @app.route('/latest')
 def latest():
     row = database.query_database(
-        'SELECT * FROM measurements ORDER BY "date time" DESC LIMIT 1'
+        'SELECT * FROM measurements ORDER BY "date time" DESC LIMIT 1',
+        one=True
     )
 
-    if row is None:
+    if not row:
         return {"error": "No data available"}, 404
 
     return {
-        "time": row[0][11:16],
-        "temperature": row[1],
-        "pressure": row[2],
-        "humidity": row[3],
-        "light": row[4]
+        "time": row["date time"][11:16],
+        "temperature": row["temperature"],
+        "pressure": row["pressure"],
+        "humidity": row["humidity"],
+        "light": row["light"]
     }
 
 # updates graph data on timescale button press
