@@ -122,7 +122,10 @@ def index():
 def latest():
     row = database.query_database(
         'SELECT * FROM measurements ORDER BY "date time" DESC LIMIT 1'
-    )[0]
+    )
+
+    if row is None:
+        return {"error": "No data available"}, 404
 
     return {
         "time": row[0][11:16],
