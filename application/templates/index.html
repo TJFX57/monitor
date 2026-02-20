@@ -22,6 +22,7 @@
             <div class="pannel-content">
                 <a href="{{ url_for('download_data') }}" title="Download all database data">Download</a>
                 <a href="{{ url_for('delete_data') }}" title="Delete all database data">Delete</a>
+                <a href="{{ url_for('log_data') }}" title="Log current data to database">Log</a>
             </div>
             <div class="pannel-content">
                 <button class="timescale-btn" data-range="15m">15 min</button>
@@ -30,20 +31,6 @@
                 <button class="timescale-btn" data-range="24h">24 hr</button>
                 <button class="timescale-btn" data-range="7d">7 days</button>
                 <button class="timescale-btn" data-range="30d">30 days</button>
-            </div>
-        </div>
-
-        <!-- Logging -->
-        <div class="pannel">
-            <div class="pannel-heading">
-                <h2>Logging</h2>
-            </div>
-            <div class="pannel-content">
-                <label for="checkbox-logging-ability">
-                    <input type="checkbox" id="checkbox-logging-ability" href="{{ url_for('change_logging_ability') }}"
-                        {{ "checked" if logging_ability}}>Data Logging
-                </label>
-                <a href="{{ url_for('log_data') }}" title="Log current data to database">Log</a>
             </div>
         </div>
 
@@ -125,10 +112,6 @@
                 <a href="{{ url_for('reboot_monitor') }}" title="Reboot monitor in 1 minute">Reboot</a>
                 <a href="{{ url_for('update_monitor') }}" title="Update monitor on next reboot">Update</a>
                 <a title="Disconnect monitor from connect">Disconnect</a>
-                <label for="checkbox-notification-lights-ability">
-                    <input type="checkbox" id="checkbox-notification-lights-ability" href="" {{ "checked" if
-                        live_view}}>Notification Lights
-                </label>
             </div>
             <div class="pannel-content">
                 <table>

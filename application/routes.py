@@ -33,11 +33,6 @@ def get_connection_strength():
     except Exception:
         return 0, 0
 
-def get_logging_job():
-    cron = CronTab(user=getlogin())
-    for job in cron.find_command('monitor.py -w'):
-        return job, cron
-
 def get_version_hash():
     try:
         result = run(['git', 'rev-parse', '--short', 'main'], cwd=BASE_DIR, text=True, capture_output=True, check=True)
@@ -74,7 +69,6 @@ def get_range_cutoff(range_key):
 
 @app.route('/')
 def index():
-    job, _ = get_logging_job()
     wifi_quality, wifi_strength = get_connection_strength()
     version = get_version_hash()
     date_time, temperature, pressure, humidity, light = monitor.read_data()
@@ -110,7 +104,6 @@ def index():
         pressure_data = pressure_data,
         humidity_data = humidity_data,
         light_data = light_data,
-        logging_ability = job.is_enabled(),
         wifi_quality = wifi_quality,
         wifi_strength = wifi_strength,
         hostname = gethostname(),
@@ -169,6 +162,7 @@ def data_range():
         "light": light_data
     })
 
+# updates all the current event data
 @app.route('/status')
 def status():
     wifi_quality, wifi_strength = get_connection_strength()
@@ -181,20 +175,6 @@ def status():
         "wifi_quality": wifi_quality,
         "wifi_strength": wifi_strength
     }
-
-@app.route('/logging_ability')
-def change_logging_ability():
-    try:
-        job, cron = get_logging_job()
-        if job.is_enabled():
-            job.enable(False)
-        else:
-            job.enable()
-        cron.write()
-        flash('Logging ability changed', 'success')
-    except Exception as e:
-        flash(f'Error changing logging ability: {str(e)}', 'error')
-    return redirect(url_for('index'))
 
 @app.route('/download_data') #TODO Stream file rather than create an intermediate file & add header to CSV
 def download_data():
@@ -227,8 +207,6 @@ def log_data():
         flash(f'Error logging data: {str(e)}', 'error')
     return redirect(url_for('index'))
 
-from datetime import datetime
-
 @app.route('/capture_image', methods=['POST'])
 def capture_image_api():
     try:
@@ -259,7 +237,6 @@ def capture_image_api():
 
     except Exception as e:
         return jsonify({'status': 'error', 'message': str(e)}), 500
-
 
 @app.route('/get_image')
 def get_image():
