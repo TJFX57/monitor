@@ -13,32 +13,60 @@ document.addEventListener("DOMContentLoaded", () => {
     Chart.defaults.plugins.legend.display = false;
 
     // ---------- chart creation ----------
-    const temperatureChartInstance = new Chart(temperatureCanvas, {
-        type: 'line',
-        data: { labels: [], datasets: [{ data: [], tension: 0.4, cubicInterpolationMode: 'monotone' }] }
-    });
+    function createChart(canvas) {
+        return new Chart(canvas, {
+            type: 'line',
+            data: {
+                labels: [],
+                datasets: [{
+                    data: [],
+                    tension: 0.4,
+                    cubicInterpolationMode: 'monotone'
+                }]
+            }
+        });
+    }
 
-    const pressureChartInstance = new Chart(pressureCanvas, {
-        type: 'line',
-        data: { labels: [], datasets: [{ data: [], tension: 0.4, cubicInterpolationMode: 'monotone' }] }
-    });
+    const charts = {
+        temperature: createChart(temperatureCanvas),
+        pressure: createChart(pressureCanvas),
+        humidity: createChart(humidityCanvas),
+        light: createChart(lightCanvas)
+    };
 
-    const humidityChartInstance = new Chart(humidityCanvas, {
-        type: 'line',
-        data: { labels: [], datasets: [{ data: [], tension: 0.4, cubicInterpolationMode: 'monotone' }] }
-    });
+    const chartKeys = Object.keys(charts);
 
-    const lightChartInstance = new Chart(lightCanvas, {
-        type: 'line',
-        data: { labels: [], datasets: [{ data: [], tension: 0.4, cubicInterpolationMode: 'monotone' }] }
-    });
+    // ---------- statistics ----------
+    function calculateStats(values) {
+        if (!values.length) {
+            return { min: '-', max: '-', avg: '-' };
+        }
 
-    const charts = [
-        temperatureChartInstance,
-        pressureChartInstance,
-        humidityChartInstance,
-        lightChartInstance
-    ];
+        const min = Math.min(...values);
+        const max = Math.max(...values);
+        const avg = values.reduce((a, b) => a + b, 0) / values.length;
+
+        return {
+            min: min.toFixed(1),
+            max: max.toFixed(1),
+            avg: avg.toFixed(1)
+        };
+    }
+
+    function updateStats(key, values) {
+        const stats = calculateStats(values);
+
+        document.getElementById(`${key}-min`).textContent = stats.min;
+        document.getElementById(`${key}-max`).textContent = stats.max;
+        document.getElementById(`${key}-avg`).textContent = stats.avg;
+    }
+
+    function updateAllStats() {
+        chartKeys.forEach(key => {
+            const values = charts[key].data.datasets[0].data;
+            updateStats(key, values);
+        });
+    }
 
     // ---------- helpers ----------
     function pushLiveData(chart, value, label, maxPoints = 60) {
@@ -52,18 +80,13 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     function replaceChartData(data) {
-        const mapping = [
-            [temperatureChartInstance, data.temperature],
-            [pressureChartInstance, data.pressure],
-            [humidityChartInstance, data.humidity],
-            [lightChartInstance, data.light]
-        ];
-
-        mapping.forEach(([chart, values]) => {
-            chart.data.labels = [...data.time];
-            chart.data.datasets[0].data = [...values];
-            chart.update();
+        chartKeys.forEach(key => {
+            charts[key].data.labels = [...data.time];
+            charts[key].data.datasets[0].data = [...data[key]];
+            charts[key].update();
         });
+
+        updateAllStats();
     }
 
     // ---------- timescale buttons ----------
@@ -73,7 +96,6 @@ document.addEventListener("DOMContentLoaded", () => {
         button.addEventListener("click", () => {
             const range = button.dataset.range;
 
-            // remove active from all buttons, add to clicked
             buttons.forEach(b => b.classList.remove("active"));
             button.classList.add("active");
 
@@ -86,14 +108,14 @@ document.addEventListener("DOMContentLoaded", () => {
     const defaultButton = document.querySelector(`[data-range="${defaultRange}"]`);
 
     if (defaultButton) {
-        buttons.forEach(b => b.classList.remove("active")); // clear any others
-        defaultButton.classList.add("active"); // highlight default immediately
+        buttons.forEach(b => b.classList.remove("active"));
+        defaultButton.classList.add("active");
     }
 
-    loadTimescale(defaultRange);          // load initial data
-    setInterval(liveUpdateCharts, 10000); // start live updates
+    loadTimescale(defaultRange);
+    setInterval(liveUpdateCharts, 10000);
 
-    // ---------- fetch initial data ----------
+    // ---------- fetch timescale data ----------
     async function loadTimescale(range) {
         try {
             const res = await fetch(`/data?range=${range}`);
@@ -101,6 +123,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
             const data = await res.json();
             replaceChartData(data);
+
         } catch (err) {
             console.error("Failed to load timescale:", err);
         }
@@ -110,18 +133,23 @@ document.addEventListener("DOMContentLoaded", () => {
     async function liveUpdateCharts() {
         try {
             const res = await fetch('/latest');
-            if (!res.ok) return; // No data yet
+            if (!res.ok) return;
 
             const data = await res.json();
-            const lastLabel = temperatureChartInstance.data.labels.at(-1);
+
+            const lastLabel = charts.temperature.data.labels.at(-1);
 
             if (!lastLabel || data.time !== lastLabel) {
-                charts.forEach((chart, i) => {
-                    const values = [data.temperature, data.pressure, data.humidity, data.light];
-                    pushLiveData(chart, values[i], data.time);
+
+                chartKeys.forEach(key => {
+                    pushLiveData(charts[key], data[key], data.time);
                 });
 
-                charts.forEach(chart => chart.update('none'));
+                chartKeys.forEach(key => {
+                    charts[key].update('none');
+                });
+
+                updateAllStats();
             }
 
         } catch (err) {

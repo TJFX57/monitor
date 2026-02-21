@@ -92,3 +92,8 @@ th, td {
     color: white;
     border-color: #4a90e2;
 }
+
+.stats .stat-line {
+    display: flex;
+    justify-content: space-between;
+}
