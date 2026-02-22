@@ -83,7 +83,7 @@ document.addEventListener("DOMContentLoaded", () => {
         chartKeys.forEach(key => {
             charts[key].data.labels = [...data.time];
             charts[key].data.datasets[0].data = [...data[key]];
-            charts[key].update();
+            charts[key].update('none');
         });
 
         updateAllStats();
