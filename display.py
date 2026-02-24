@@ -1,6 +1,9 @@
-from PiicoDev_RGB import PiicoDev_RGB
+# Standard library
 import json
 from pathlib import Path
+
+# Third-party
+from PiicoDev_RGB import PiicoDev_RGB
 
 BASE_DIR = Path(__file__).resolve().parent
 JSON_PATH = BASE_DIR / "instance" / "display.json"
@@ -16,9 +19,9 @@ WHITE   = [255, 255, 255]
 CLEAR   = [0, 0, 0]
 
 LED_INDEX = {
-    'r': 0, #LED0: Read
-    'w': 1, #LED1: Write
-    's': 2  #LED2: Server
+    'r': 0, #LED0: Read LED
+    'w': 1, #LED1: Write LED
+    's': 2  #LED2: Server LED
 }
 
 class Display():
@@ -37,12 +40,12 @@ class Display():
         else:
             self._set_light(self._mode, colour=CLEAR)
 
-    # Sets all LEDs to the saved values
+    # sets all LEDs to the saved values
     def _set_display(self):
         for key_led_index, value_colour in self._state.items():
             self._set_light(key_led_index, value_colour)
 
-    # Set read/write/server LED to given colour
+    # set read/write/server LED to given colour
     def _set_light(self, led_index, colour):
         try:
             self._light_output.setPixel(led_index, colour)
@@ -52,7 +55,7 @@ class Display():
         except:
             pass
 
-    # Read saved display state from JSON file
+    # read saved display state from JSON file
     def _read_state(self):
         state = {}
         try:
@@ -69,7 +72,7 @@ class Display():
         finally:
             return state
 
-    # Write display state to JSON file
+    # write display state to JSON file
     def _write_state(self):
         with open(JSON_PATH, 'w') as file:
             json.dump(self._state, file)

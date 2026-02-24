@@ -1,24 +1,28 @@
-from flask import current_app as app, request
-from flask import render_template
-from flask import send_file
-from flask import redirect
-from flask import url_for
-from flask import flash
-from flask import jsonify
-
-from application import database
-
-from crontab import CronTab
-from os import getlogin
-from subprocess import run
-from socket import gethostname
+# Standard library
 import csv
-import monitor
 import re
-import exifread
 from datetime import datetime, timedelta
-
 from pathlib import Path
+from socket import gethostname
+from subprocess import run
+
+# Third-party
+import exifread
+from flask import (
+    current_app as app,
+    request,
+    render_template,
+    send_file,
+    redirect,
+    url_for,
+    flash,
+    jsonify,
+)
+
+# Local
+from application import database
+import monitor
+import display
 
 BASE_DIR = Path(__file__).resolve().parent
 IMAGE_PATH = BASE_DIR.parent / "instance" / "image.jpeg"
