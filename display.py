@@ -76,3 +76,6 @@ class Display():
     def _write_state(self):
         with open(JSON_PATH, 'w') as file:
             json.dump(self._state, file)
+            
+    def set_colour(self, colour):
+        self._set_light(self._mode, colour)

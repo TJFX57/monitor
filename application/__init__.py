@@ -7,7 +7,7 @@ from flask import Flask
 
 # Local application imports
 from application import database
-from display import Display, BLUE, GREEN, RED
+from display import Display, BLUE, GREEN, RED  # ← added colours
 
 display = Display(mode='s')
 
@@ -20,18 +20,8 @@ def init_app():
     display.__enter__()
     register(exit_app)
 
-    # Create app ONCE
-    app = Flask(__name__, instance_relative_config=True)
+    app = Flask(__name__)
 
-    app.config['SECRET_KEY'] = os.environ.get(
-        'SECRET_KEY',
-        'dev-secret-key-change-in-production'
-    )
-
-    # Ensure instance folder exists
-    os.makedirs(app.instance_path, exist_ok=True)
-
-    # LED Request Hooks
     @app.before_request
     def before_request():
         display.set_colour(BLUE)
@@ -46,11 +36,24 @@ def init_app():
         if exception:
             display.set_colour(RED)
 
-    # Init database
+    # enable instance relative configuration
+    app = Flask(__name__, instance_relative_config=True)
+    
+    # set secret key for sessions and flash messages
+    app.config['SECRET_KEY'] = os.environ.get(
+        'SECRET_KEY',
+        'dev-secret-key-change-in-production'
+    )
+
+    # ensure the instance folder exists
+    try:
+        os.makedirs(app.instance_path)
+    except OSError:
+        pass
+
     database.init_app(app)
 
     with app.app_context():
         from . import routes
         database.init_database()
-
-    return app
+        return app
