@@ -6,6 +6,9 @@ document.addEventListener("DOMContentLoaded", () => {
     const humidityCanvas = document.getElementById('humidity-chart');
     const lightCanvas = document.getElementById('light-chart');
 
+    // ---------- track active range ----------
+    let currentRange = "1h";
+
     // ---------- global chart styling ----------
     Chart.defaults.color = 'lightgrey';
     Chart.defaults.borderColor = 'lightslategray';
@@ -96,6 +99,8 @@ document.addEventListener("DOMContentLoaded", () => {
         button.addEventListener("click", () => {
             const range = button.dataset.range;
 
+            currentRange = range;   // Track selected range
+
             buttons.forEach(b => b.classList.remove("active"));
             button.classList.add("active");
 
@@ -105,6 +110,8 @@ document.addEventListener("DOMContentLoaded", () => {
 
     // ---------- initial load ----------
     const defaultRange = "1h";
+    currentRange = defaultRange;
+
     const defaultButton = document.querySelector(`[data-range="${defaultRange}"]`);
 
     if (defaultButton) {
@@ -113,7 +120,22 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     loadTimescale(defaultRange);
-    setInterval(liveUpdateCharts, 10000);
+
+    function startMinutePolling() {
+
+        const now = new Date();
+
+        let secondsUntilNextMinute = 60 - now.getSeconds();
+        let delay = (secondsUntilNextMinute + 10) * 1000;
+
+        setTimeout(() => {
+            liveUpdateCharts();
+            setInterval(liveUpdateCharts, 60000);
+        }, delay);
+    }
+
+    // Update chart every minture
+    startMinutePolling();
 
     // ---------- fetch timescale data ----------
     async function loadTimescale(range) {
@@ -131,6 +153,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
     // ---------- live updates ----------
     async function liveUpdateCharts() {
+
         try {
             const res = await fetch('/latest');
             if (!res.ok) return;
