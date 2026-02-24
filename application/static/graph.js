@@ -121,21 +121,8 @@ document.addEventListener("DOMContentLoaded", () => {
 
     loadTimescale(defaultRange);
 
-    function startMinutePolling() {
-
-        const now = new Date();
-
-        let secondsUntilNextMinute = 60 - now.getSeconds();
-        let delay = (secondsUntilNextMinute + 10) * 1000;
-
-        setTimeout(() => {
-            liveUpdateCharts();
-            setInterval(liveUpdateCharts, 60000);
-        }, delay);
-    }
-
-    // Update chart every minture
-    startMinutePolling();
+    // Run live updates every 10 seconds
+    setInterval(liveUpdateCharts, 10000);
 
     // ---------- fetch timescale data ----------
     async function loadTimescale(range) {
