@@ -11,7 +11,6 @@ from display import Display, BLUE, GREEN, RED  # ← added colours
 
 display = Display(mode='s')
 
-
 def exit_app():
     display.__exit__(None, None, None)
 
@@ -20,25 +19,26 @@ def init_app():
     display.__enter__()
     register(exit_app)
 
-    app = Flask(__name__)
+    # enable instance relative configuration
+    app = Flask(__name__, instance_relative_config=True)
 
     @app.before_request
     def before_request():
+        # turn the LED blue at the start of the request
         display.set_colour(BLUE)
 
     @app.after_request
     def after_request(response):
+        # turn the LED green after the request finishes
         display.set_colour(GREEN)
         return response
 
     @app.teardown_request
+        # turn the LED red if there was an exception
     def teardown_request(exception):
         if exception:
             display.set_colour(RED)
 
-    # enable instance relative configuration
-    app = Flask(__name__, instance_relative_config=True)
-    
     # set secret key for sessions and flash messages
     app.config['SECRET_KEY'] = os.environ.get(
         'SECRET_KEY',
