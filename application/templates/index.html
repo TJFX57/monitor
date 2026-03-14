@@ -106,6 +106,61 @@
             </div>
         </div>
 
+        <!-- AQI -->
+        <div class="pannel-tall">
+            <div class="pannel-heading">
+                <h2>Air Quality Index</h2>
+            </div>
+            <div class="pannel-content">
+                <p id="aqi">Currently: {{ aqi }}</p>
+            </div>
+            <div class="pannel-content">
+                <canvas id="aqi-chart"></canvas>
+            </div>
+            <div class="pannel-content">
+                Min: <span id="aqi-min">-</span>
+                Max: <span id="aqi-max">-</span>
+                Avg: <span id="aqi-avg">-</span>
+            </div>
+        </div>
+
+        <!-- TVOC -->
+        <div class="pannel-tall">
+            <div class="pannel-heading">
+                <h2>TVOC</h2>
+            </div>
+            <div class="pannel-content">
+                <p id="tvoc">Currently: {{ tvoc }}ppb</p>
+            </div>
+            <div class="pannel-content">
+                <canvas id="tvoc-chart"></canvas>
+            </div>
+            <div class="pannel-content">
+                Min: <span id="tvoc-min">-</span> ppb
+                Max: <span id="tvoc-max">-</span> ppb
+                Avg: <span id="tvoc-avg">-</span> ppb
+            </div>
+
+        </div>
+
+        <!-- eCO2 -->
+        <div class="pannel-tall">
+            <div class="pannel-heading">
+                <h2>eCO2</h2>
+            </div>
+            <div class="pannel-content">
+                <p id="eco2">Currently: {{ eco2 }}ppm</p>
+            </div>
+            <div class="pannel-content">
+                <canvas id="eco2-chart"></canvas>
+            </div>
+            <div class="pannel-content">
+                Min: <span id="eco2-min">-</span> ppm
+                Max: <span id="eco2-max">-</span> ppm
+                Avg: <span id="eco2-avg">-</span> ppm
+            </div>
+        </div>
+
         <!-- Image -->
         <div class="pannel-tall">
             <div class="pannel-heading">
@@ -162,10 +217,10 @@
         <!-- Display -->
         <div class="pannel">
             <div class="pannel-heading">
-                <h2>Dispaly</h2>
+                <h2>Display</h2>
             </div>
             <div class="pannel-content">
-                
+
             </div>
         </div>
 
@@ -175,6 +230,9 @@
             const pressureData = {{ pressure_data| tojson }};
             const humidityData = {{ humidity_data| tojson }};
             const lightData = {{ light_data| tojson }};
+            const aqiData = {{ aqi_data| tojson }};
+            const tvocData = {{ tvoc_data| tojson }};
+            const eco2Data = {{ eco2_data| tojson }};
         </script>
 
     </div>

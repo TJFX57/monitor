@@ -5,6 +5,9 @@ document.addEventListener("DOMContentLoaded", () => {
     const pressureCanvas = document.getElementById('pressure-chart');
     const humidityCanvas = document.getElementById('humidity-chart');
     const lightCanvas = document.getElementById('light-chart');
+    const aqiCanvas = document.getElementById('aqi-chart');
+    const tvocCanvas = document.getElementById('tvoc-chart');
+    const eco2Canvas = document.getElementById('eco2-chart');
 
     // ---------- track active range ----------
     let currentRange = "1h";
@@ -34,7 +37,10 @@ document.addEventListener("DOMContentLoaded", () => {
         temperature: createChart(temperatureCanvas),
         pressure: createChart(pressureCanvas),
         humidity: createChart(humidityCanvas),
-        light: createChart(lightCanvas)
+        light: createChart(lightCanvas),
+        aqi: createChart(aqiCanvas),
+        tvoc: createChart(tvocCanvas),
+        eco2: createChart(eco2Canvas)
     };
 
     const chartKeys = Object.keys(charts);

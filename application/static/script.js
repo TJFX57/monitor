@@ -14,6 +14,12 @@ async function updateLiveMeasurements() {
             `Currently: ${data.humidity}RH`;
         document.getElementById('light').textContent =
             `Currently: ${data.light}lx`;
+        document.getElementById('aqi').textContent =
+            `Currently: ${data.aqi}`;
+        document.getElementById('tvoc').textContent =
+            `Currently: ${data.tvoc}ppb`;
+        document.getElementById('eco2').textContent =
+            `Currently: ${data.eco2}ppm`;
 
         // update time update
         document.getElementById('last-update').textContent = `${new Date().toLocaleTimeString()}`;

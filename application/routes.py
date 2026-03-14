@@ -75,12 +75,15 @@ def get_range_cutoff(range_key):
 def index():
     wifi_quality, wifi_strength = get_connection_strength()
     version = get_version_hash()
-    date_time, temperature, pressure, humidity, light = monitor.read_data()
+    date_time, temperature, pressure, humidity, light, aqi, tvoc, eco2 = monitor.read_data()
     time_data = []
     temperature_data = []
     pressure_data = []
     humidity_data = []
     light_data = []
+    aqi_data = []
+    tvoc_data = []
+    eco2_data = []
     image_captured = get_date_taken(IMAGE_PATH)
 
     # get the latest 60 elements (as 1 recording a minute) and reverse
@@ -95,6 +98,9 @@ def index():
         pressure_data.append(row[2])
         humidity_data.append(row[3])
         light_data.append(row[4])
+        aqi_data.append(row[5])
+        tvoc_data.append(row[6])
+        eco2_data.append(row[7])
 
     return render_template(
         'index.html',
@@ -103,11 +109,17 @@ def index():
         pressure = pressure,
         humidity = humidity,
         light = light,
+        aqi = aqi,
+        tvoc = tvoc,
+        eco2 = eco2,
         time_data = time_data,
         temperature_data = temperature_data,
         pressure_data = pressure_data,
         humidity_data = humidity_data,
         light_data = light_data,
+        aqi_data = aqi_data,
+        tvoc_data = tvoc_data,
+        eco2_data = eco2_data,
         wifi_quality = wifi_quality,
         wifi_strength = wifi_strength,
         hostname = gethostname(),
@@ -130,7 +142,10 @@ def latest():
         "temperature": row["temperature"],
         "pressure": row["pressure"],
         "humidity": row["humidity"],
-        "light": row["light"]
+        "light": row["light"],
+        "aqi": row["aqi"],
+        "tvoc": row["tvoc"],
+        "eco2": row["eco2"]
     }
 
 # updates graph data on timescale button press
@@ -150,6 +165,9 @@ def data_range():
     pressure_data = []
     humidity_data = []
     light_data = []
+    aqi_data = []
+    tvoc_data = []
+    eco2_data = []
 
     for row in rows:
         time_data.append(row[0][11:16])
@@ -163,19 +181,25 @@ def data_range():
         "temperature": temperature_data,
         "pressure": pressure_data,
         "humidity": humidity_data,
-        "light": light_data
+        "light": light_data,
+        "aqi": aqi_data,
+        "tvoc": tvoc_data,
+        "eco2": eco2_data
     })
 
 # updates all the current event data
 @app.route('/status')
 def status():
     wifi_quality, wifi_strength = get_connection_strength()
-    date_time, temperature, pressure, humidity, light = monitor.read_data()
+    date_time, temperature, pressure, humidity, light, aqi, tvoc, eco2 = monitor.read_data()
     return {
         "temperature": temperature,
         "pressure": pressure,
         "humidity": humidity,
         "light": light,
+        "aqi": aqi,
+        "tvoc": tvoc,
+        "eco2": eco2,
         "wifi_quality": wifi_quality,
         "wifi_strength": wifi_strength
     }
