@@ -7,7 +7,7 @@ from flask import Flask
 
 # Local application imports
 from application import database
-from display import Display, BLUE, GREEN, RED  # ← added colours
+from display import Display, BLUE, GREEN, RED
 
 display = Display(mode='s')
 

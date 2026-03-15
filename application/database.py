@@ -20,12 +20,13 @@ def init_database():
         database.cursor().executescript(file.read())
     database.commit()
 
-# peform a function directly on the database
+# Peform a function directly on the database
 def execute_database(query, args=()):
     cursor = get_database()
     cursor.execute(query, args)
     cursor.commit()
 
+# Perform a query on the database and return the results
 def query_database(query, args=(), one=False, names=False):
     cursor = get_database().execute(query, args)
     rows = cursor.fetchall()
@@ -35,11 +36,12 @@ def query_database(query, args=(), one=False, names=False):
     cursor.close()
     return (rows[0] if rows else None) if one else rows
 
+# Close the database connection at the end of the request
 def close_database(e=None):
     database = getattr(g, '_database', None)
     if database is not None:
         database.close()
 
-# function references to be access by the app's context manager
+# Function references to be access by the app's context manager
 def init_app(app):
     app.teardown_appcontext(close_database)

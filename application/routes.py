@@ -175,6 +175,9 @@ def data_range():
         pressure_data.append(row[2])
         humidity_data.append(row[3])
         light_data.append(row[4])
+        aqi_data.append(row[5])
+        tvoc_data.append(row[6])
+        eco2_data.append(row[7])
 
     return jsonify({
         "time": time_data,

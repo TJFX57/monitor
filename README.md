@@ -8,8 +8,8 @@ use raspberry pi imager to image sd card to raspberry pi os
 	select apprporate settings to allow for headless start up
 	use raspberry pi connect to allow for IP finding if not connected on owned network
 git clone https://github.com/TJFX57/monitor.git
-create venv
-install cronjobs
+create venv (python -m venv venv)
+install cronjobs TODO: this fails if the app inst run manually the first time as the instance folder isn't made yet
 install requirements.txt
 activate i2c on pi
 reboot
