@@ -153,7 +153,7 @@ def write_data(data: tuple, mode='a'):
                 connection = sqlite3.connect(DATABASE_PATH)
                 with open(DATABASE_SCHEMA_PATH, mode='r') as schema:
                     connection.execute(schema.read())
-                connection.execute('INSERT INTO measurements VALUES(?, ?, ?, ?, ?, ?, ?, ?)', data[0], data[1], data[2], data[3], data[4], data[5], data[6], data[7], mode)
+                connection.execute('INSERT INTO measurements VALUES(?, ?, ?, ?, ?, ?, ?, ?)', (data[0], data[1], data[2], data[3], data[4], data[5], data[6], mode))
                 connection.commit()
                 
             except Exception as e:
