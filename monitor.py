@@ -147,17 +147,23 @@ def read_data(sample_size=3):
     return date_time, temp_C_ave, pres_HPa_ave, hum_RH_ave, light_Lx_ave, aqi_ave, tvoc_ave, eco2_ave
 
 def write_data(data: tuple, mode='a'):
+        
         with Display(mode='w'):
             try:
                 connection = sqlite3.connect(DATABASE_PATH)
                 with open(DATABASE_SCHEMA_PATH, mode='r') as schema:
                     connection.execute(schema.read())
-                connection.execute('INSERT INTO measurements VALUES(?, ?, ?, ?, ?, ?, ?, ?)', (data[0], data[1], data[2], data[3], data[4], data[5], data[6], data[7]))
+                connection.execute('INSERT INTO measurements VALUES(?, ?, ?, ?, ?, ?, ?, ?)', data)
                 connection.commit()
-                connection.close()
+                
             except Exception as e:
+                print("Error writing to database:", e)
                 connection.close()
                 raise e
+            
+            finally:
+                if connection:
+                    connection.close()
 
 if __name__ == '__main__':
     # Initialize the input argument parser, add and parse input arguments
