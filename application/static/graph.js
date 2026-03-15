@@ -13,10 +13,10 @@ document.addEventListener("DOMContentLoaded", () => {
     let currentRange = "1h";
 
     // ---------- global chart styling ----------
-    charts.defaults.color = 'lightgrey';
-    charts.defaults.borderColor = 'lightslategray';
-    charts.defaults.elements.point.pointStyle = false;
-    charts.defaults.plugins.legend.display = false;
+    Chart.defaults.color = 'lightgrey';
+    Chart.defaults.borderColor = 'lightslategray';
+    Chart.defaults.elements.point.pointStyle = false;
+    Chart.defaults.plugins.legend.display = false;
 
     // ---------- chart creation ----------
     function createChart(canvas) {
